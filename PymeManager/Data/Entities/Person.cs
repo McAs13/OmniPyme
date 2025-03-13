@@ -1,0 +1,22 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PymeManager.Data.Entities
+{
+    public class Person
+    {
+        [Key]
+        public int IdPersona { get; set; }
+        [Display(Name = "Nombre")]
+        [Required(ErrorMessage = "El campo Nombre es obligatorio")]
+        public string NombrePersona { get; set; } = null!;
+        [Display(Name = "Apellido")]
+        [Required(ErrorMessage = "El campo Apellido es obligatorio")]
+        public string ApellidoPersona { get; set; } = null!;
+        [Display(Name = "Email")]
+        [Required(ErrorMessage = "El campo Email es obligatorio")]
+        public string EmailPersona { get; set; } = null!;
+        [Display(Name = "Telefono")]
+        [Required(ErrorMessage = "El campo Telefono es obligatorio")]
+        public string TelefonoPersona { get; set; } = null!;
+    }
+}
