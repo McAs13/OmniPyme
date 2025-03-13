@@ -15,7 +15,7 @@ namespace PymeManager.Data.Entities
         [Display(Name = "Email")]
         [Required(ErrorMessage = "El campo Email es obligatorio")]
         public string EmailPersona { get; set; } = null!;
-        [Display(Name = "Telefono")]
+        [Display(Name = "Teléfono")]
         [Required(ErrorMessage = "El campo Telefono es obligatorio")]
         public string TelefonoPersona { get; set; } = null!;
     }
