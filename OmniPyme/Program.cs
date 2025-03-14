@@ -1,4 +1,4 @@
-using PymeManager.Web;
+using OmniPyme.Web;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

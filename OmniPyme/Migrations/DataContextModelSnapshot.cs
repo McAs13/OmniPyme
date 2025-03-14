@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PymeManager.Data;
+using OmniPyme.Data;
 
 #nullable disable
 
-namespace PymeManager.Web.Migrations
+namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
     partial class DataContextModelSnapshot : ModelSnapshot
@@ -21,7 +21,7 @@ namespace PymeManager.Web.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("PymeManager.Data.Entities.Person", b =>
+            modelBuilder.Entity("OmniPyme.Data.Entities.Person", b =>
                 {
                     b.Property<int>("IdPersona")
                         .ValueGeneratedOnAdd()

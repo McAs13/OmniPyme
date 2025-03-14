@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PymeManager.Data;
+using OmniPyme.Data;
 
 #nullable disable
 
-namespace PymeManager.Web.Migrations
+namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250313195904_PersonsTable")]
+    [Migration("20250314003636_PersonsTable")]
     partial class PersonsTable
     {
         /// <inheritdoc />
@@ -24,7 +24,7 @@ namespace PymeManager.Web.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("PymeManager.Data.Entities.Person", b =>
+            modelBuilder.Entity("OmniPyme.Data.Entities.Person", b =>
                 {
                     b.Property<int>("IdPersona")
                         .ValueGeneratedOnAdd()

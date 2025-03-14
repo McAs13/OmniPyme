@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PymeManager.Data;
+using OmniPyme.Data;
 
-namespace PymeManager.Web
+namespace OmniPyme.Web
 {
     public static class CustomConfiguration
     {

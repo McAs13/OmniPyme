@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PymeManager.Data.Entities;
+using OmniPyme.Data.Entities;
 
-namespace PymeManager.Data
+namespace OmniPyme.Data
 {
     public class DataContext : DbContext
     {

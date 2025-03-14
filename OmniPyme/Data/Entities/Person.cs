@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PymeManager.Data.Entities
+namespace OmniPyme.Data.Entities
 {
     public class Person
     {

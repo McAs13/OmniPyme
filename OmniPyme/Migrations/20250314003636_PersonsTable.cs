@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace PymeManager.Web.Migrations
+namespace OmniPyme.Web.Migrations
 {
     /// <inheritdoc />
     public partial class PersonsTable : Migration
