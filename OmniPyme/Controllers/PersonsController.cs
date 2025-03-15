@@ -18,6 +18,7 @@ namespace OmniPyme.Web.Controllers
         public async Task<IActionResult> Index()
         {
             Response<List<PersonDTO>> response = await _personsService.GetListAsync();
+            ViewData["ActivePage"] = "Persons";
             return View(response.Result);
         }
     }
