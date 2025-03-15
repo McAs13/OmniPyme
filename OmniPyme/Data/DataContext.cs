@@ -8,6 +8,6 @@ namespace OmniPyme.Data
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
-        public DbSet<Person> Personas { get; set; }
+        public DbSet<Person> Persons { get; set; }
     }
 }

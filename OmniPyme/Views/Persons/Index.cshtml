@@ -1,0 +1,56 @@
+﻿@model List<PersonDTO>
+@{
+	ViewData["Title"] = "Personas";
+}
+
+<div class="pagetitle">
+    <h1>Personas</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item active">Personas</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+
+<section class="section dashboard">
+
+    <div class="card">
+        <div class="card-header">
+			<h3 class="card-title">Personas</h3>
+        </div>
+		<div class="card-body">
+			<div class="table-responsive">
+				<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Nombre</th>
+							<th>Apellido</th>
+							<th>Correo</th>
+							<th>Telefono</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (PersonDTO item in Model)
+						{
+							<tr>
+								<td>@item.IdPersona</td>
+								<td>@item.NombrePersona</td>
+								<td>@item.ApellidoPersona</td>
+								<td>@item.EmailPersona</td>
+								<td>@item.TelefonoPersona</td>
+								<td>
+									<a href="#" class="btn btn-warning btn-sm"><i class="bi bi-pencil-fill"></i></a>
+									@* <a asp-controller="Persons" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a> *@
+									<a href="#" class="btn btn-danger btn-sm"><i class="bi bi-trash-fill"></i></a>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+    </div>
+
+</section>

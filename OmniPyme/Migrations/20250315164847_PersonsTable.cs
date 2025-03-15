@@ -11,7 +11,7 @@ namespace OmniPyme.Web.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Personas",
+                name: "Persons",
                 columns: table => new
                 {
                     IdPersona = table.Column<int>(type: "int", nullable: false)
@@ -23,7 +23,7 @@ namespace OmniPyme.Web.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Personas", x => x.IdPersona);
+                    table.PrimaryKey("PK_Persons", x => x.IdPersona);
                 });
         }
 
@@ -31,7 +31,7 @@ namespace OmniPyme.Web.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Personas");
+                name: "Persons");
         }
     }
 }

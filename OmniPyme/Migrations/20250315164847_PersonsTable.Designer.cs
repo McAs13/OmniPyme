@@ -11,7 +11,7 @@ using OmniPyme.Data;
 namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250314003636_PersonsTable")]
+    [Migration("20250315164847_PersonsTable")]
     partial class PersonsTable
     {
         /// <inheritdoc />
@@ -50,7 +50,7 @@ namespace OmniPyme.Web.Migrations
 
                     b.HasKey("IdPersona");
 
-                    b.ToTable("Personas");
+                    b.ToTable("Persons");
                 });
 #pragma warning restore 612, 618
         }

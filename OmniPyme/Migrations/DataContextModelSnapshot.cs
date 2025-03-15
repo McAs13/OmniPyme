@@ -47,7 +47,7 @@ namespace OmniPyme.Web.Migrations
 
                     b.HasKey("IdPersona");
 
-                    b.ToTable("Personas");
+                    b.ToTable("Persons");
                 });
 #pragma warning restore 612, 618
         }
