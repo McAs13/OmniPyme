@@ -1,1 +1,1 @@
-# OmniPyme
+# PymeManager
