@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AspNetCoreHero.ToastNotification;
+using AspNetCoreHero.ToastNotification.Extensions;
+using Microsoft.EntityFrameworkCore;
 using OmniPyme.Data;
 using OmniPyme.Web.Services;
 
@@ -20,12 +22,27 @@ namespace OmniPyme.Web
             //Services
             AddServices(builder);
 
+            // Toast Notification SetUp
+            builder.Services.AddNotyf(config =>
+            {
+                config.DurationInSeconds = 10;
+                config.IsDismissable = true;
+                config.Position = NotyfPosition.BottomRight;
+            });
+
             return builder;
         }
 
         private static void AddServices(WebApplicationBuilder builder)
         {
-            builder.Services.AddScoped<IPersonsService, PersonsService>();
+            builder.Services.AddScoped<IClientsService, ClientsService>();
+        }
+
+        public static WebApplication AddCustomWebApplicationConfiguration(this WebApplication app)
+        {
+            app.UseNotyf();
+
+            return app;
         }
     }
 }

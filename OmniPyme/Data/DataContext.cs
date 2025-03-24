@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OmniPyme.Data.Entities;
+using OmniPyme.Web.Data.Entities;
 
 namespace OmniPyme.Data
 {
@@ -8,6 +8,6 @@ namespace OmniPyme.Data
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
-        public DbSet<Person> Persons { get; set; }
+        public DbSet<Client> Clients { get; set; }
     }
 }
