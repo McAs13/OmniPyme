@@ -21,7 +21,6 @@ namespace OmniPyme.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            ViewData["ActivePage"] = "Clients";
             Response<List<ClientDTO>> response = await _clientsService.GetListAsync();
             return View(response.Result);
         }
@@ -29,7 +28,6 @@ namespace OmniPyme.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            ViewData["ActivePage"] = "Clients";
             ClientDTO model = new ClientDTO
             {
                 RegisterDate = DateTime.Now,
@@ -116,5 +114,21 @@ namespace OmniPyme.Web.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> toggle([FromForm] ToggleClientStatusDTO dto)
+        //{
+        //    Response<object> response = await _clientsService.ToggleAsync(dto);
+        //    if (response.IsSuccess)
+        //    {
+        //        _notyfService.Success(response.Message);
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    else
+        //    {
+        //        _notyfService.Error(response.Message);
+        //    }
+        //    return RedirectToAction(nameof(Index));
+        //}
     }
 }

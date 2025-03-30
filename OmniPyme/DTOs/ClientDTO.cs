@@ -19,6 +19,7 @@ namespace OmniPyme.Web.DTOs
 
         [MaxLength(32, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        [EmailAddress(ErrorMessage = "El campo {0} debe ser un correo electrónico válido")]
         [Display(Name = "Email")]
         public string Email { get; set; } = null!;
 

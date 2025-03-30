@@ -16,6 +16,7 @@ namespace OmniPyme.Web.Services
         public Task<Response<ClientDTO>> EditAsync(ClientDTO dto);
         public Task<Response<List<ClientDTO>>> GetListAsync();
         public Task<Response<ClientDTO>> GetOneAsync(int id);
+        //public Task<Response<object>> ToggleAsync(ToggleClientStatusDTO dto); //No se usa en esta clase pero se puede implementar en el futuro
     }
 
     public class ClientsService : IClientsService
@@ -133,5 +134,34 @@ namespace OmniPyme.Web.Services
                 return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
             }
         }
+
+        //public async Task<Response<object>> ToggleAsync(ToggleClientStatusDTO dto)
+        //{
+        //    try
+        //    {
+        //        Response<ClientDTO> response = await GetOneAsync(dto.ClientId);
+
+        //        if (!response.IsSuccess)
+        //        {
+        //            return ResponseHelper<object>.MakeResponseFail($"No existe un cliente con id {dto.ClientId}");
+        //        }
+
+        //        Client client = _mapper.Map<Client>(response.Result);
+        //        client.Hide = dto.Hide;
+
+        //        //Lineas equivalentes
+        //        //_context.Clients.Update(client);
+        //        _context.Entry(client).State = EntityState.Modified;
+
+        //        await _context.SaveChangesAsync();
+
+        //        return ResponseHelper<object>.MakeResponseSuccess("Estado del cliente actualizado con éxito");
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ResponseHelper<object>.MakeResponseFail(ex);
+        //    }
+        //}
     }
 }
