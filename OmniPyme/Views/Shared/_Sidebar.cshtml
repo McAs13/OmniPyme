@@ -15,6 +15,17 @@
 				<i class="bi bi-person"></i>
 				<span>Personas</span>
 			</a>
+		</li>
+
+		<li class="nav-item">
+			<a class="nav-link @(ViewData["ActivePage"] as string == "Roles" ? "" : "collapsed") active" asp-controller="Role" asp-action="Index">
+				<i class="bi bi-people"></i>
+				<span>Roles</span>
+			</a>
+		</li>
+
+
+		
 
 	</ul>
 
