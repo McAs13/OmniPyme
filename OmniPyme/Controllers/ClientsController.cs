@@ -2,6 +2,7 @@
 using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using OmniPyme.Web.Core;
+using OmniPyme.Web.Core.Pagination;
 using OmniPyme.Web.DTOs;
 using OmniPyme.Web.Services;
 
@@ -19,9 +20,9 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
-            Response<List<ClientDTO>> response = await _clientsService.GetListAsync();
+            Response<PaginationResponse<ClientDTO>> response = await _clientsService.GetPaginationAsync(request);
             return View(response.Result);
         }
 

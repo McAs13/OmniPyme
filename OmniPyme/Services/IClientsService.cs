@@ -3,6 +3,7 @@ using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using OmniPyme.Data;
 using OmniPyme.Web.Core;
+using OmniPyme.Web.Core.Pagination;
 using OmniPyme.Web.Data.Entities;
 using OmniPyme.Web.DTOs;
 using OmniPyme.Web.Helpers;
@@ -16,6 +17,8 @@ namespace OmniPyme.Web.Services
         public Task<Response<ClientDTO>> EditAsync(ClientDTO dto);
         public Task<Response<List<ClientDTO>>> GetListAsync();
         public Task<Response<ClientDTO>> GetOneAsync(int id);
+        public Task<Response<PaginationResponse<ClientDTO>>> GetPaginationAsync(PaginationRequest request);
+
         //public Task<Response<object>> ToggleAsync(ToggleClientStatusDTO dto); //No se usa en esta clase pero se puede implementar en el futuro
     }
 
@@ -132,6 +135,31 @@ namespace OmniPyme.Web.Services
             catch (Exception ex)
             {
                 return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
+            }
+        }
+
+        public async Task<Response<PaginationResponse<ClientDTO>>> GetPaginationAsync(PaginationRequest request)
+        {
+            try
+            {
+                IQueryable<Client> query = _context.Clients.AsNoTracking().AsQueryable();
+
+                PagedList<Client> list = await PagedList<Client>.ToPagedListAsync(query, request);
+
+                PaginationResponse<ClientDTO> response = new PaginationResponse<ClientDTO>
+                {
+                    List = _mapper.Map<PagedList<ClientDTO>>(list),
+                    TotalPages = list.TotalPages,
+                    CurrentPage = list.CurrentPage,
+                    RecordsPerPage = list.RecordsPerPage,
+                    TotalRecords = list.TotalRecords
+                };
+
+                return ResponseHelper<PaginationResponse<ClientDTO>>.MakeResponseSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHelper<PaginationResponse<ClientDTO>>.MakeResponseFail(ex);
             }
         }
 
