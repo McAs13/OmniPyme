@@ -60,6 +60,24 @@ namespace OmniPyme.Web.Migrations
 
                     b.ToTable("Clients");
                 });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Role", b =>
+                {
+                    b.Property<int>("IdRol")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
+
+                    b.Property<string>("RolName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("IdRol");
+
+                    b.ToTable("Roles");
+                });
 #pragma warning restore 612, 618
         }
     }

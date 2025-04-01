@@ -12,8 +12,8 @@ using OmniPyme.Data;
 namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250324210114_ClientTable")]
-    partial class ClientTable
+    [Migration("20250331003607_InitialSchema")]
+    partial class InitialSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,6 +62,24 @@ namespace OmniPyme.Web.Migrations
                     b.HasKey("IdClient");
 
                     b.ToTable("Clients");
+                });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Role", b =>
+                {
+                    b.Property<int>("IdRol")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
+
+                    b.Property<string>("RolName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("IdRol");
+
+                    b.ToTable("Roles");
                 });
 #pragma warning restore 612, 618
         }

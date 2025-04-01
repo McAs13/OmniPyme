@@ -1,83 +1,103 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OmniPyme.Data;
-using OmniPyme.Web.Data.Entities;
-using System.Threading.Tasks;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Mvc;
+using OmniPyme.Web.Core;
+using OmniPyme.Web.DTOs;
+using OmniPyme.Web.Services;
 
 namespace OmniPyme.Web.Controllers
 {
     public class RoleController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IRolesService _rolesService;
+        private readonly INotyfService _notyfService;
 
-        public RoleController(DataContext context)
+        public RoleController(IRolesService rolesService, INotyfService notyfService)
         {
-            _context = context;
+            _rolesService = rolesService;
+            _notyfService = notyfService;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Roles.ToListAsync());
+            Response<List<RolDTO>> response = await _rolesService.GetListAsync();
+            return View(response.Result);
         }
 
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Role role)
+        public async Task<IActionResult> Create(RolDTO dto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(role);
-                await _context.SaveChangesAsync();
+                _notyfService.Error("Debe ajustar los errores de validación");
+                return View(dto);
+            }
+
+            Response<RolDTO> response = await _rolesService.CreateAsync(dto);
+
+            if (response.IsSuccess)
+            {
+                _notyfService.Success(response.Message);
                 return RedirectToAction(nameof(Index));
             }
-            return View(role);
+
+            _notyfService.Error(response.Message);
+            return View(dto);
         }
 
-        public async Task<IActionResult> Edit(int id)
+        [HttpGet]
+        public async Task<IActionResult> Edit([FromRoute] int id)
         {
-            var role = await _context.Roles.FindAsync(id);
-            if (role == null) return NotFound();
-            return View(role);
+            Response<RolDTO> response = await _rolesService.GetOneAsync(id);
+
+            if (response.IsSuccess)
+            {
+                return View(response.Result);
+            }
+
+            _notyfService.Error(response.Message);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Role role)
+        public async Task<IActionResult> Edit(RolDTO dto)
         {
-            if (id != role.IdRol) return NotFound(); // ← Corregido
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Update(role);
-                await _context.SaveChangesAsync();
+                _notyfService.Error("Debe ajustar los errores de validación");
+                return View(dto);
+            }
+
+            Response<RolDTO> response = await _rolesService.EditAsync(dto);
+
+            if (response.IsSuccess)
+            {
+                _notyfService.Success(response.Message);
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(role);
+            _notyfService.Error(response.Message);
+            return View(dto);
         }
 
-        public async Task<IActionResult> Delete(int id)
+        [HttpPost]
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var role = await _context.Roles.FindAsync(id);
-            if (role == null) return NotFound();
-            return View(role);
-        }
+            Response<object> response = await _rolesService.DeleteAsync(id);
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var role = await _context.Roles.FindAsync(id);
-            if (role != null)
+            if (response.IsSuccess)
             {
-                _context.Roles.Remove(role);
-                await _context.SaveChangesAsync();
+                _notyfService.Success(response.Message);
+                return RedirectToAction(nameof(Index));
             }
+
+            _notyfService.Error(response.Message);
             return RedirectToAction(nameof(Index));
         }
     }
