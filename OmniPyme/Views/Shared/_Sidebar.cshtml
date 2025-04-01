@@ -4,16 +4,16 @@
 	<ul class="sidebar-nav" id="sidebar-nav">
 
 		<li class="nav-item">
-			<a class="nav-link @(ViewData["ActivePage"] as string == "Dashboard" ? "" : "collapsed") active" asp-controller="Home" asp-action="Index">
+			<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "" : "collapsed") active" asp-controller="Home" asp-action="Index">
 				<i class="bi bi-grid"></i>
 				<span>Dashboard</span>
 			</a>
 		</li><!-- End Dashboard Nav -->
 
 		<li class="nav-item">
-			<a class="nav-link @(ViewData["ActivePage"] as string == "Persons" ? "" : "collapsed") active" asp-controller="Persons" asp-action="Index">
+			<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Clients" ? "" : "collapsed") active" asp-controller="Clients" asp-action="Index">
 				<i class="bi bi-person"></i>
-				<span>Personas</span>
+				<span>Clientes</span>
 			</a>
 		</li>
 

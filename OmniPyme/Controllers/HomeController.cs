@@ -15,7 +15,6 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        ViewData["ActivePage"] = "Dashboard";
         return View();
     }
 

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using OmniPyme.Data.Entities;
+using OmniPyme.Web.Data.Entities;
 using OmniPyme.Web.DTOs;
 
 namespace OmniPyme.Web.Core
@@ -8,7 +8,7 @@ namespace OmniPyme.Web.Core
     {
         public AutoMapperProfiles()
         {
-            CreateMap<Person, PersonDTO>().ReverseMap();
+            CreateMap<Client, ClientDTO>().ReverseMap();
         }
     }
 }

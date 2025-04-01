@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AspNetCoreHero.ToastNotification;
+using AspNetCoreHero.ToastNotification.Extensions;
+using Microsoft.EntityFrameworkCore;
 using OmniPyme.Data;
+using OmniPyme.Web.Data.Seeders;
 using OmniPyme.Web.Services;
 
 namespace OmniPyme.Web
@@ -20,12 +23,41 @@ namespace OmniPyme.Web
             //Services
             AddServices(builder);
 
+            // Toast Notification SetUp
+            builder.Services.AddNotyf(config =>
+            {
+                config.DurationInSeconds = 10;
+                config.IsDismissable = true;
+                config.Position = NotyfPosition.BottomRight;
+            });
+
             return builder;
         }
 
         private static void AddServices(WebApplicationBuilder builder)
         {
-            builder.Services.AddScoped<IPersonsService, PersonsService>();
+            builder.Services.AddScoped<IClientsService, ClientsService>();
+            builder.Services.AddTransient<SeedDb>();
+        }
+
+        public static WebApplication AddCustomWebApplicationConfiguration(this WebApplication app)
+        {
+            app.UseNotyf();
+
+            SeedData(app);
+
+            return app;
+        }
+
+        private static void SeedData(WebApplication app)
+        {
+            IServiceScopeFactory scopeFactory = app.Services.GetService<IServiceScopeFactory>();
+
+            using (IServiceScope scope = scopeFactory.CreateScope())
+            {
+                SeedDb service = scope.ServiceProvider.GetService<SeedDb>();
+                service.SeedAsync().Wait();
+            }
         }
     }
 }
