@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Humanizer;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using OmniPyme.Data;
 using OmniPyme.Web.Core;
@@ -46,6 +47,11 @@ namespace OmniPyme.Web.Services
             }
             catch (Exception ex)
             {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Message.Contains("IX_Clients_DNI"))
+                {
+                    return ResponseHelper<ClientDTO>.MakeResponseFail("El documento ya está registrado en el sistema.");
+                }
+
                 return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
             }
         }
@@ -97,6 +103,11 @@ namespace OmniPyme.Web.Services
             }
             catch (Exception ex)
             {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Message.Contains("IX_Clients_DNI"))
+                {
+                    return ResponseHelper<ClientDTO>.MakeResponseFail("El documento ya está registrado en el sistema.");
+                }
+
                 return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
             }
         }

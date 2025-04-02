@@ -22,6 +22,13 @@
 			<form asp-action="Create" method="POST" class="row g-3">
 				<div class="col-md-6">
 					<div class="form-floating">
+						<input asp-for="DNI" class="form-control" placeholder="DNI" />
+						<label asp-for="DNI"></label>
+						<span asp-validation-for="DNI" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-floating">
 						<input asp-for="FirstName" class="form-control" placeholder="Nombre" />
 						<label asp-for="FirstName"></label>
 						<span asp-validation-for="FirstName" class="text-danger"></span>

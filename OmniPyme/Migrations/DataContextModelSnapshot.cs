@@ -30,6 +30,11 @@ namespace OmniPyme.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdClient"));
 
+                    b.Property<string>("DNI")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -57,6 +62,9 @@ namespace OmniPyme.Web.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("IdClient");
+
+                    b.HasIndex("DNI")
+                        .IsUnique();
 
                     b.ToTable("Clients");
                 });

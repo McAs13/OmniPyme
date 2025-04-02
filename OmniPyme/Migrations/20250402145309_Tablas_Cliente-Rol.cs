@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace OmniPyme.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialSchema : Migration
+    public partial class Tablas_ClienteRol : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,6 +17,7 @@ namespace OmniPyme.Web.Migrations
                 {
                     IdClient = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    DNI = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
@@ -41,6 +42,12 @@ namespace OmniPyme.Web.Migrations
                 {
                     table.PrimaryKey("PK_Roles", x => x.IdRol);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clients_DNI",
+                table: "Clients",
+                column: "DNI",
+                unique: true);
         }
 
         /// <inheritdoc />

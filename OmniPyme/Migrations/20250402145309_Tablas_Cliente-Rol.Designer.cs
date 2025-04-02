@@ -12,8 +12,8 @@ using OmniPyme.Data;
 namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250331003607_InitialSchema")]
-    partial class InitialSchema
+    [Migration("20250402145309_Tablas_Cliente-Rol")]
+    partial class Tablas_ClienteRol
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,11 @@ namespace OmniPyme.Web.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdClient"));
+
+                    b.Property<string>("DNI")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -60,6 +65,9 @@ namespace OmniPyme.Web.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("IdClient");
+
+                    b.HasIndex("DNI")
+                        .IsUnique();
 
                     b.ToTable("Clients");
                 });

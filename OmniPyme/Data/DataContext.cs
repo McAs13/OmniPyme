@@ -11,6 +11,15 @@ namespace OmniPyme.Data
 
 
         public DbSet<Client> Clients { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Client>()
+                .HasIndex(c => c.DNI)
+                .IsUnique(); // Hace que la cédula sea única en la BD
+
+            base.OnModelCreating(modelBuilder);
+        }
         public DbSet<Role> Roles { get; set; }
 
     }
