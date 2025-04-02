@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OmniPyme.Data;
 
@@ -11,9 +12,11 @@ using OmniPyme.Data;
 namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250402163050_AddSalesTable")]
+    partial class AddSalesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,46 +72,20 @@ namespace OmniPyme.Web.Migrations
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Invoice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("IdSale")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("InvoiceDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("InvoiceNumber")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdSale");
-
-                    b.ToTable("Invoices");
-                });
-
             modelBuilder.Entity("OmniPyme.Web.Data.Entities.Role", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdRol")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
 
                     b.Property<string>("RolName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdRol");
 
                     b.ToTable("Roles");
                 });
@@ -120,6 +97,9 @@ namespace OmniPyme.Web.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ClientIdClient")
+                        .HasColumnType("int");
 
                     b.Property<int>("IdClient")
                         .HasColumnType("int");
@@ -138,29 +118,16 @@ namespace OmniPyme.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdClient");
+                    b.HasIndex("ClientIdClient");
 
                     b.ToTable("Sales");
-                });
-
-            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Invoice", b =>
-                {
-                    b.HasOne("OmniPyme.Web.Data.Entities.Sale", "Sale")
-                        .WithMany()
-                        .HasForeignKey("IdSale")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Sale");
                 });
 
             modelBuilder.Entity("OmniPyme.Web.Data.Entities.Sale", b =>
                 {
                     b.HasOne("OmniPyme.Web.Data.Entities.Client", "Client")
                         .WithMany()
-                        .HasForeignKey("IdClient")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClientIdClient");
 
                     b.Navigation("Client");
                 });

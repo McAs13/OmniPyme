@@ -6,12 +6,12 @@ using OmniPyme.Web.Services;
 
 namespace OmniPyme.Web.Controllers
 {
-    public class RoleController : Controller
+    public class RolesController : Controller
     {
         private readonly IRolesService _rolesService;
         private readonly INotyfService _notyfService;
 
-        public RoleController(IRolesService rolesService, INotyfService notyfService)
+        public RolesController(IRolesService rolesService, INotyfService notyfService)
         {
             _rolesService = rolesService;
             _notyfService = notyfService;
@@ -20,7 +20,7 @@ namespace OmniPyme.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            Response<List<RolDTO>> response = await _rolesService.GetListAsync();
+            Response<List<RoleDTO>> response = await _rolesService.GetListAsync();
             return View(response.Result);
         }
 
@@ -31,7 +31,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(RolDTO dto)
+        public async Task<IActionResult> Create(RoleDTO dto)
         {
             if (!ModelState.IsValid)
             {
@@ -39,7 +39,7 @@ namespace OmniPyme.Web.Controllers
                 return View(dto);
             }
 
-            Response<RolDTO> response = await _rolesService.CreateAsync(dto);
+            Response<RoleDTO> response = await _rolesService.CreateAsync(dto);
 
             if (response.IsSuccess)
             {
@@ -54,7 +54,7 @@ namespace OmniPyme.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit([FromRoute] int id)
         {
-            Response<RolDTO> response = await _rolesService.GetOneAsync(id);
+            Response<RoleDTO> response = await _rolesService.GetOneAsync(id);
 
             if (response.IsSuccess)
             {
@@ -66,7 +66,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(RolDTO dto)
+        public async Task<IActionResult> Edit(RoleDTO dto)
         {
             if (!ModelState.IsValid)
             {
@@ -74,7 +74,7 @@ namespace OmniPyme.Web.Controllers
                 return View(dto);
             }
 
-            Response<RolDTO> response = await _rolesService.EditAsync(dto);
+            Response<RoleDTO> response = await _rolesService.EditAsync(dto);
 
             if (response.IsSuccess)
             {

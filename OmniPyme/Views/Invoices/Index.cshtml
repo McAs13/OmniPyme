@@ -1,4 +1,4 @@
-﻿@model PaginationResponse<ClientDTO>
+﻿@model PaginationResponse<InvoiceDTO>
 @{
 	ViewData["Title"] = "Clientes";
 }
@@ -8,7 +8,7 @@
 	<nav>
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
-			<li class="breadcrumb-item active">Clientes</li>
+			<li class="breadcrumb-item active">Facturas</li>
 		</ol>
 	</nav>
 </div><!-- End Page Title -->
@@ -18,7 +18,7 @@
 	<div class="card">
 		<div class="card-header">
 			<div class="row">
-				<h3 class="card-title col-md-11">Clientes</h3>
+				<h3 class="card-title col-md-11">Facturas</h3>
 				<div class="col-md-1">
 					<a asp-action="Create" class="btn btn-primary"><i class="bi bi-person-plus"></i></a>
 				</div>
@@ -31,53 +31,23 @@
 					<thead>
 						<tr>
 							<th>ID</th>
-							<th>DNI</th>
-							<th>Nombre</th>
-							<th>Apellido</th>
-							<th>Correo</th>
-							<th>Telefono</th>
-							<th>Fecha de Registro</th>
-							<th>Ultima Compra</th>
-							<th>Acciones</th>
+							<th>Factura N.</th>
+							<th>Fecha de factura</th>
+							<th>Total</th> @* TODO: Inner Join para traer el total desde la tabla Sale *@
+							<th></th>
 						</tr>
 					</thead>
 					<tbody>
-						@foreach (ClientDTO item in Model.List)
+						@foreach (InvoiceDTO item in Model.List)
 						{
 							<tr>
 								<td>@item.Id</td>
-								<td>@item.DNI</td>
-								<td>@item.FirstName</td>
-								<td>@item.LastName</td>
-								<td>@item.Email</td>
-								<td>@item.Phone</td>
-								<td>@item.RegisterDate</td>
-								<td>@item.LastPurchaseDate</td>
+								<td>@item.InvoiceNumber</td>
+								<td>@item.InvoiceDate</td>
+								<td>@* TODO: Inner Join para traer el total desde la tabla Sale *@</td>
+								
 								<td>
 									<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm"><i class="bi bi-pencil-fill"></i></a>
-
-									@* @if (item.IsHidden)
-									{
-										<form asp-action="Toggle" style="display: contents;" method="POST">
-											<input type="hidden" value="@item.Id" name="ClientId" />
-											<input type="hidden" value="false" name="Hide" />
-											<button class="btn btn-sm btn-secondary">
-												<i class="bi bi-eye"></i>
-											</button>
-										</form>
-									}
-									else
-									{
-										<form asp-action="Toggle" style="display: contents;" method="POST">
-											<input type="hidden" value="@item.Id" name="ClientId" />
-											<input type="hidden" value="true" name="Hide" />
-											<button class="btn btn-sm btn-info">
-												<i class="bi bi-eye-slash-fill"></i>
-											</button>
-										</form>
-									}
- *@
-
 									<form asp-action="Delete" asp-route-id="@item.Id" style="display: contents;">
 										<button class="btn btn-danger btn-sm btnDelete"><i class="bi bi-trash-fill"></i></button>
 									</form>
@@ -99,13 +69,13 @@
 						</li>
 
 						@* Paginas *@
-						@foreach(int page in Model.Pages)
+						@foreach (int page in Model.Pages)
 						{
 							<li class="page-item @(Model.CurrentPage == page ? "disabled" : "")">
 								<a class="page-link" asp-action="Index" asp-route-Page="@(page)" asp-route-recordsPerPage="@Model.RecordsPerPage">@(page)</a>
 							</li>
 						}
-						
+
 						@* Siguiente *@
 						<li class="page-item @(!Model.HasNext ? "disabled" : "")">
 							<a class="page-link" asp-action="Index" asp-route-Page="@(Model.CurrentPage + 1)" asp-route-recordsPerPage="@Model.RecordsPerPage"><i class="bi bi-chevron-right"></i></a>
@@ -126,7 +96,7 @@
 	<script>
 		$(document).ready(function () {
 			$('.btnDelete').click(function (event) {
-				
+
 				event.preventDefault();
 
 				Swal.fire({

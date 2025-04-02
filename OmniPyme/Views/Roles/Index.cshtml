@@ -1,4 +1,4 @@
-﻿@model List<RolDTO>
+﻿@model List<RoleDTO>
 @{
 	ViewData["Title"] = "Roles";
 }
@@ -40,14 +40,14 @@
 						@foreach (var item in Model)
 						{
 							<tr>
-								<td>@item.IdRol</td>
+								<td>@item.Id</td>
 								<td>@item.RolName</td>
 								<td>
-									<a asp-action="Edit" asp-route-id="@item.IdRol" class="btn btn-warning btn-sm">
+									<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
 										<i class="bi bi-pencil-fill"></i>
 									</a>
 
-									<form asp-action="Delete" asp-route-id="@item.IdRol" method="post" style="display:inline">
+									<form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline">
 										@Html.AntiForgeryToken()
 										<button type="submit" class="btn btn-danger btn-sm btnDelete">
 											<i class="bi bi-trash-fill"></i>

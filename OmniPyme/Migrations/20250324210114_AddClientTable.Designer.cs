@@ -12,8 +12,8 @@ using OmniPyme.Data;
 namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250402145309_Tablas_Cliente-Rol")]
-    partial class Tablas_ClienteRol
+    [Migration("20250324210114_AddClientTable")]
+    partial class AddClientTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,11 @@ namespace OmniPyme.Web.Migrations
 
             modelBuilder.Entity("OmniPyme.Web.Data.Entities.Client", b =>
                 {
-                    b.Property<int>("IdClient")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdClient"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("DNI")
                         .IsRequired()
@@ -64,30 +64,12 @@ namespace OmniPyme.Web.Migrations
                     b.Property<DateTime>("RegisterDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("IdClient");
+                    b.HasKey("Id");
 
                     b.HasIndex("DNI")
                         .IsUnique();
 
                     b.ToTable("Clients");
-                });
-
-            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Role", b =>
-                {
-                    b.Property<int>("IdRol")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
-
-                    b.Property<string>("RolName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("IdRol");
-
-                    b.ToTable("Roles");
                 });
 #pragma warning restore 612, 618
         }

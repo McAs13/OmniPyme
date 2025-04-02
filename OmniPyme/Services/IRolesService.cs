@@ -10,11 +10,11 @@ namespace OmniPyme.Web.Services
 {
     public interface IRolesService
     {
-        Task<Response<RolDTO>> CreateAsync(RolDTO dto);
+        Task<Response<RoleDTO>> CreateAsync(RoleDTO dto);
         Task<Response<object>> DeleteAsync(int id);
-        Task<Response<RolDTO>> EditAsync(RolDTO dto);
-        Task<Response<List<RolDTO>>> GetListAsync();
-        Task<Response<RolDTO>> GetOneAsync(int id);
+        Task<Response<RoleDTO>> EditAsync(RoleDTO dto);
+        Task<Response<List<RoleDTO>>> GetListAsync();
+        Task<Response<RoleDTO>> GetOneAsync(int id);
     }
 
     public class RolesService : IRolesService
@@ -28,18 +28,18 @@ namespace OmniPyme.Web.Services
             _mapper = mapper;
         }
 
-        public async Task<Response<RolDTO>> CreateAsync(RolDTO dto)
+        public async Task<Response<RoleDTO>> CreateAsync(RoleDTO dto)
         {
             try
             {
                 Role role = _mapper.Map<Role>(dto);
                 await _context.AddAsync(role);
                 await _context.SaveChangesAsync();
-                return ResponseHelper<RolDTO>.MakeResponseSuccess(dto, "Rol creado con éxito");
+                return ResponseHelper<RoleDTO>.MakeResponseSuccess(dto, "Rol creado con éxito");
             }
             catch (Exception ex)
             {
-                return ResponseHelper<RolDTO>.MakeResponseFail(ex);
+                return ResponseHelper<RoleDTO>.MakeResponseFail(ex);
             }
         }
 
@@ -47,7 +47,7 @@ namespace OmniPyme.Web.Services
         {
             try
             {
-                Response<RolDTO> response = await GetOneAsync(id);
+                Response<RoleDTO> response = await GetOneAsync(id);
 
                 if (!response.IsSuccess)
                 {
@@ -66,11 +66,11 @@ namespace OmniPyme.Web.Services
             }
         }
 
-        public async Task<Response<RolDTO>> EditAsync(RolDTO dto)
+        public async Task<Response<RoleDTO>> EditAsync(RoleDTO dto)
         {
             try
             {
-                Response<RolDTO> response = await GetOneAsync(dto.IdRol);
+                Response<RoleDTO> response = await GetOneAsync(dto.Id);
 
                 if (!response.IsSuccess)
                 {
@@ -81,45 +81,45 @@ namespace OmniPyme.Web.Services
                 _context.Entry(role).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
-                return ResponseHelper<RolDTO>.MakeResponseSuccess(dto, "Rol actualizado con éxito");
+                return ResponseHelper<RoleDTO>.MakeResponseSuccess(dto, "Rol actualizado con éxito");
             }
             catch (Exception ex)
             {
-                return ResponseHelper<RolDTO>.MakeResponseFail(ex);
+                return ResponseHelper<RoleDTO>.MakeResponseFail(ex);
             }
         }
 
-        public async Task<Response<List<RolDTO>>> GetListAsync()
+        public async Task<Response<List<RoleDTO>>> GetListAsync()
         {
             try
             {
                 List<Role> roles = await _context.Roles.ToListAsync();
-                List<RolDTO> list = _mapper.Map<List<RolDTO>>(roles);
-                return ResponseHelper<List<RolDTO>>.MakeResponseSuccess(list);
+                List<RoleDTO> list = _mapper.Map<List<RoleDTO>>(roles);
+                return ResponseHelper<List<RoleDTO>>.MakeResponseSuccess(list);
             }
             catch (Exception ex)
             {
-                return ResponseHelper<List<RolDTO>>.MakeResponseFail(ex);
+                return ResponseHelper<List<RoleDTO>>.MakeResponseFail(ex);
             }
         }
 
-        public async Task<Response<RolDTO>> GetOneAsync(int id)
+        public async Task<Response<RoleDTO>> GetOneAsync(int id)
         {
             try
             {
-                Role? role = await _context.Roles.AsNoTracking().FirstOrDefaultAsync(r => r.IdRol == id);
+                Role? role = await _context.Roles.AsNoTracking().FirstOrDefaultAsync(r => r.Id == id);
 
                 if (role is null)
                 {
-                    return ResponseHelper<RolDTO>.MakeResponseFail($"Rol con id {id} no encontrado");
+                    return ResponseHelper<RoleDTO>.MakeResponseFail($"Rol con id {id} no encontrado");
                 }
 
-                RolDTO dto = _mapper.Map<RolDTO>(role);
-                return ResponseHelper<RolDTO>.MakeResponseSuccess(dto, "Rol obtenido con éxito");
+                RoleDTO dto = _mapper.Map<RoleDTO>(role);
+                return ResponseHelper<RoleDTO>.MakeResponseSuccess(dto, "Rol obtenido con éxito");
             }
             catch (Exception ex)
             {
-                return ResponseHelper<RolDTO>.MakeResponseFail(ex);
+                return ResponseHelper<RoleDTO>.MakeResponseFail(ex);
             }
         }
     }

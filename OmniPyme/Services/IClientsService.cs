@@ -23,12 +23,12 @@ namespace OmniPyme.Web.Services
         //public Task<Response<object>> ToggleAsync(ToggleClientStatusDTO dto); //No se usa en esta clase pero se puede implementar en el futuro
     }
 
-    public class ClientsService : IClientsService
+    public class ClientsService : CustomQueryableOperations, IClientsService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
 
-        public ClientsService(DataContext context, IMapper mapper)
+        public ClientsService(DataContext context, IMapper mapper) : base(context, mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -36,80 +36,88 @@ namespace OmniPyme.Web.Services
 
         public async Task<Response<ClientDTO>> CreateAsync(ClientDTO dto)
         {
-            try
-            {
-                Client client = _mapper.Map<Client>(dto);
+            //try
+            //{
+            //    Client client = _mapper.Map<Client>(dto);
 
-                await _context.AddAsync(client);
-                await _context.SaveChangesAsync();
+            //    await _context.AddAsync(client);
+            //    await _context.SaveChangesAsync();
 
-                return ResponseHelper<ClientDTO>.MakeResponseSuccess(dto, "Cliente creado con éxito");
-            }
-            catch (Exception ex)
-            {
-                if (ex.InnerException is SqlException sqlEx && sqlEx.Message.Contains("IX_Clients_DNI"))
-                {
-                    return ResponseHelper<ClientDTO>.MakeResponseFail("El documento ya está registrado en el sistema.");
-                }
+            //    return ResponseHelper<ClientDTO>.MakeResponseSuccess(dto, "Cliente creado con éxito");
+            //}
+            //catch (Exception ex)
+            //{
+            //    if (ex.InnerException is SqlException sqlEx && sqlEx.Message.Contains("IX_Clients_DNI"))
+            //    {
+            //        return ResponseHelper<ClientDTO>.MakeResponseFail("El documento ya está registrado en el sistema.");
+            //    }
 
-                return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
-            }
+            //    return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
+            //}
+
+            return await CreateAsync<Client, ClientDTO>(dto);
         }
 
         public async Task<Response<object>> DeleteAsync(int id)
         {
-            try
-            {
-                Response<ClientDTO> response = await GetOneAsync(id);
+            //try
+            //{
+            //    Response<ClientDTO> response = await GetOneAsync(id);
 
-                if (!response.IsSuccess)
-                {
-                    return ResponseHelper<object>.MakeResponseFail(response.Message);
-                }
+            //    if (!response.IsSuccess)
+            //    {
+            //        return ResponseHelper<object>.MakeResponseFail(response.Message);
+            //    }
 
-                Client client = _mapper.Map<Client>(response.Result);
-                _context.Clients.Remove(client);
-                //TODO: Validar si esto se puede hacer o es mas optimo el de arriba
-                //_context.Clients.Remove(_mapper.Map<Client>(response.Result));
+            //    Client client = _mapper.Map<Client>(response.Result);
+            //    _context.Clients.Remove(client);
+            //    //TODO: Validar si esto se puede hacer o es mas optimo el de arriba
+            //    //_context.Clients.Remove(_mapper.Map<Client>(response.Result));
 
-                await _context.SaveChangesAsync();
+            //    await _context.SaveChangesAsync();
 
-                return ResponseHelper<object>.MakeResponseSuccess("Cliente eliminado con éxito");
+            //    return ResponseHelper<object>.MakeResponseSuccess("Cliente eliminado con éxito");
 
-            }
-            catch (Exception ex)
-            {
-                return ResponseHelper<object>.MakeResponseFail(ex);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return ResponseHelper<object>.MakeResponseFail(ex);
+            //}
+
+            Response<object> response = await DeleteAsync<Client>(id);
+            response.Message = !response.IsSuccess ? $"El cliente con id: {id} no existe" : response.Message;
+            return response;
         }
 
         public async Task<Response<ClientDTO>> EditAsync(ClientDTO dto)
         {
-            try
-            {
-                Response<ClientDTO> responseDto = await GetOneAsync(dto.IdClient);
+            //try
+            //{
+            //    Response<ClientDTO> responseDto = await GetOneAsync(dto.Id);
 
-                if (!responseDto.IsSuccess)
-                {
-                    return responseDto;
-                }
+            //    if (!responseDto.IsSuccess)
+            //    {
+            //        return responseDto;
+            //    }
 
-                Client client = _mapper.Map<Client>(dto);
+            //    Client client = _mapper.Map<Client>(dto);
 
-                _context.Entry(client).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
+            //    _context.Entry(client).State = EntityState.Modified;
+            //    await _context.SaveChangesAsync();
 
-                return ResponseHelper<ClientDTO>.MakeResponseSuccess(dto, "Cliente actualizado con éxito");
-            }
-            catch (Exception ex)
-            {
-                if (ex.InnerException is SqlException sqlEx && sqlEx.Message.Contains("IX_Clients_DNI"))
-                {
-                    return ResponseHelper<ClientDTO>.MakeResponseFail("El documento ya está registrado en el sistema.");
-                }
+            //    return ResponseHelper<ClientDTO>.MakeResponseSuccess(dto, "Cliente actualizado con éxito");
+            //}
+            //catch (Exception ex)
+            //{
+            //    if (ex.InnerException is SqlException sqlEx && sqlEx.Message.Contains("IX_Clients_DNI"))
+            //    {
+            //        return ResponseHelper<ClientDTO>.MakeResponseFail("El documento ya está registrado en el sistema.");
+            //    }
 
-                return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
-            }
+            //    return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
+            //}
+
+            return await EditAsync<Client, ClientDTO>(dto, dto.Id);
         }
 
         public async Task<Response<List<ClientDTO>>> GetListAsync()
@@ -130,48 +138,52 @@ namespace OmniPyme.Web.Services
 
         public async Task<Response<ClientDTO>> GetOneAsync(int id)
         {
-            try
-            {
-                Client? client = await _context.Clients.AsNoTracking().FirstOrDefaultAsync(c => c.IdClient == id);
+            //try
+            //{
+            //    Client? client = await _context.Clients.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
 
-                if (client is null)
-                {
-                    return ResponseHelper<ClientDTO>.MakeResponseFail($"Cliente con id {id} no encontrado");
-                }
+            //    if (client is null)
+            //    {
+            //        return ResponseHelper<ClientDTO>.MakeResponseFail($"Cliente con id {id} no encontrado");
+            //    }
 
-                ClientDTO dto = _mapper.Map<ClientDTO>(client);
+            //    ClientDTO dto = _mapper.Map<ClientDTO>(client);
 
-                return ResponseHelper<ClientDTO>.MakeResponseSuccess(dto, "Cliente obtenido con éxito");
-            }
-            catch (Exception ex)
-            {
-                return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
-            }
+            //    return ResponseHelper<ClientDTO>.MakeResponseSuccess(dto, "Cliente obtenido con éxito");
+            //}
+            //catch (Exception ex)
+            //{
+            //    return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
+            //}
+
+            return await GetOneAsync<Client, ClientDTO>(id);
         }
 
         public async Task<Response<PaginationResponse<ClientDTO>>> GetPaginationAsync(PaginationRequest request)
         {
-            try
-            {
-                IQueryable<Client> query = _context.Clients.AsNoTracking().AsQueryable();
+            //try
+            //{
+            //    IQueryable<Client> query = _context.Clients.AsNoTracking().AsQueryable();
 
-                PagedList<Client> list = await PagedList<Client>.ToPagedListAsync(query, request);
+            //    PagedList<Client> list = await PagedList<Client>.ToPagedListAsync(query, request);
 
-                PaginationResponse<ClientDTO> response = new PaginationResponse<ClientDTO>
-                {
-                    List = _mapper.Map<PagedList<ClientDTO>>(list),
-                    TotalPages = list.TotalPages,
-                    CurrentPage = list.CurrentPage,
-                    RecordsPerPage = list.RecordsPerPage,
-                    TotalRecords = list.TotalRecords
-                };
+            //    PaginationResponse<ClientDTO> response = new PaginationResponse<ClientDTO>
+            //    {
+            //        List = _mapper.Map<PagedList<ClientDTO>>(list),
+            //        TotalPages = list.TotalPages,
+            //        CurrentPage = list.CurrentPage,
+            //        RecordsPerPage = list.RecordsPerPage,
+            //        TotalRecords = list.TotalRecords
+            //    };
 
-                return ResponseHelper<PaginationResponse<ClientDTO>>.MakeResponseSuccess(response);
-            }
-            catch (Exception ex)
-            {
-                return ResponseHelper<PaginationResponse<ClientDTO>>.MakeResponseFail(ex);
-            }
+            //    return ResponseHelper<PaginationResponse<ClientDTO>>.MakeResponseSuccess(response);
+            //}
+            //catch (Exception ex)
+            //{
+            //    return ResponseHelper<PaginationResponse<ClientDTO>>.MakeResponseFail(ex);
+            //}
+
+            return await GetPaginationAsync<Client, ClientDTO>(request);
         }
 
         //public async Task<Response<object>> ToggleAsync(ToggleClientStatusDTO dto)

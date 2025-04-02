@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OmniPyme.Data;
 
@@ -11,9 +12,11 @@ using OmniPyme.Data;
 namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250402193210_AddInvoicesTable")]
+    partial class AddInvoicesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,27 +91,30 @@ namespace OmniPyme.Web.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
+                    b.Property<int?>("SaleId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("IdSale");
+                    b.HasIndex("SaleId");
 
                     b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("OmniPyme.Web.Data.Entities.Role", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdRol")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
 
                     b.Property<string>("RolName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdRol");
 
                     b.ToTable("Roles");
                 });
@@ -120,6 +126,9 @@ namespace OmniPyme.Web.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ClientId")
+                        .HasColumnType("int");
 
                     b.Property<int>("IdClient")
                         .HasColumnType("int");
@@ -138,7 +147,7 @@ namespace OmniPyme.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdClient");
+                    b.HasIndex("ClientId");
 
                     b.ToTable("Sales");
                 });
@@ -147,9 +156,7 @@ namespace OmniPyme.Web.Migrations
                 {
                     b.HasOne("OmniPyme.Web.Data.Entities.Sale", "Sale")
                         .WithMany()
-                        .HasForeignKey("IdSale")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SaleId");
 
                     b.Navigation("Sale");
                 });
@@ -158,9 +165,7 @@ namespace OmniPyme.Web.Migrations
                 {
                     b.HasOne("OmniPyme.Web.Data.Entities.Client", "Client")
                         .WithMany()
-                        .HasForeignKey("IdClient")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClientId");
 
                     b.Navigation("Client");
                 });

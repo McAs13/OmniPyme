@@ -14,6 +14,9 @@ namespace OmniPyme.Web.Data.Seeders
         public async Task SeedAsync()
         {
             await new ClientSeeder(_context).SeedAsync();
+            await new SaleSeeder(_context).SeedAsync();
+            await new InvoiceSeeder(_context).SeedAsync();
+            await new RoleSeeder(_context).SeedAsync();
         }
     }
 }

@@ -5,7 +5,7 @@ namespace OmniPyme.Web.DTOs
     public class ClientDTO
     {
         [Key]
-        public int IdClient { get; set; }
+        public int Id { get; set; }
 
         [MaxLength(32, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]

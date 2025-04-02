@@ -38,6 +38,7 @@ namespace OmniPyme.Web
         {
             builder.Services.AddScoped<IClientsService, ClientsService>();
             builder.Services.AddScoped<IRolesService, RolesService>();
+            builder.Services.AddScoped<IInvoicesService, InvoicesService>();
             builder.Services.AddTransient<SeedDb>();
         }
 
