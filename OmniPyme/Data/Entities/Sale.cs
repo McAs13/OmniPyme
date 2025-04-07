@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace OmniPyme.Web.Data.Entities
 {
-    public class Sale
+    public class Sale : IId
     {
         [Key]
         public int Id { get; set; }
@@ -22,6 +22,10 @@ namespace OmniPyme.Web.Data.Entities
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [Precision(18, 2)]
         public decimal SaleTotal { get; set; }
+
+        [Display(Name = "Codigo de Venta")]
+        [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        public string SaleCode { get; set; }
 
         [ForeignKey("Client")] // Indica que IdClient es la clave foránea
         public int IdClient { get; set; }

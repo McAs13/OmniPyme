@@ -23,6 +23,10 @@ namespace OmniPyme.Web.DTOs
         [Precision(18, 2)]
         public decimal SaleTotal { get; set; }
 
+        [Display(Name = "Codigo de Venta")]
+        [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        public string SaleCode { get; set; }
+
         public Client? Client { get; set; }
 
         public int IdClient { get; set; }

@@ -11,6 +11,7 @@ namespace OmniPyme.Web.Core
             CreateMap<Client, ClientDTO>().ReverseMap();
             CreateMap<Role, RoleDTO>().ReverseMap();
             CreateMap<Invoice, InvoiceDTO>().ReverseMap();
+            CreateMap<Sale, SaleDTO>().ReverseMap();
         }
     }
 }

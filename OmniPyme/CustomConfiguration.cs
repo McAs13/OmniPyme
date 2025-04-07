@@ -3,6 +3,7 @@ using AspNetCoreHero.ToastNotification.Extensions;
 using Microsoft.EntityFrameworkCore;
 using OmniPyme.Data;
 using OmniPyme.Web.Data.Seeders;
+using OmniPyme.Web.Helpers;
 using OmniPyme.Web.Services;
 
 namespace OmniPyme.Web
@@ -36,10 +37,15 @@ namespace OmniPyme.Web
 
         private static void AddServices(WebApplicationBuilder builder)
         {
+            //Services
             builder.Services.AddScoped<IClientsService, ClientsService>();
             builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddScoped<IInvoicesService, InvoicesService>();
+            builder.Services.AddScoped<ISalesService, SalesService>();
             builder.Services.AddTransient<SeedDb>();
+
+            //Helpers
+            builder.Services.AddScoped<ICombosHelper, CombosHelper>();
         }
 
         public static WebApplication AddCustomWebApplicationConfiguration(this WebApplication app)

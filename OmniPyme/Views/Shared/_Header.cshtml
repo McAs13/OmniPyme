@@ -2,7 +2,7 @@
 <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-        <a href="index.html" class="logo d-flex align-items-center">
+        <a asp-controller="Home" asp-action="Index" class="logo d-flex align-items-center">
             <img src="~/assets/img/logo.png" alt="">
             <span class="d-none d-lg-block">OmniPyme</span>
         </a>
@@ -20,14 +20,14 @@
         <ul class="d-flex align-items-center">
 
             <li class="nav-item d-block d-lg-none">
-                <a class="nav-link nav-icon search-bar-toggle " href="#">
+                <a class="nav-link nav-icon search-bar-toggle ">
                     <i class="bi bi-search"></i>
                 </a>
             </li><!-- End Search Icon-->
 
             <li class="nav-item dropdown">
 
-                <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                <a class="nav-link nav-icon" data-bs-toggle="dropdown">
                     <i class="bi bi-bell"></i>
                     <span class="badge bg-primary badge-number">4</span>
                 </a><!-- End Notification Icon -->

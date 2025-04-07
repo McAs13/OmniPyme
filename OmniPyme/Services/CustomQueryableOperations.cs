@@ -30,7 +30,10 @@ namespace OmniPyme.Web.Services
                 await _context.AddAsync(entity);
                 await _context.SaveChangesAsync();
 
-                return ResponseHelper<TDTO>.MakeResponseSuccess(dto, "Registro creado con éxito");
+                // Asignar el ID generado al DTO
+                TDTO resultDTO = _mapper.Map<TDTO>(entity);
+
+                return ResponseHelper<TDTO>.MakeResponseSuccess(resultDTO, "Registro creado con éxito");
             }
             catch (Exception ex)
             {
@@ -111,13 +114,16 @@ namespace OmniPyme.Web.Services
             }
         }
 
-        public async Task<Response<PaginationResponse<TDTO>>> GetPaginationAsync<TEntity, TDTO>(PaginationRequest request)
+        public async Task<Response<PaginationResponse<TDTO>>> GetPaginationAsync<TEntity, TDTO>(PaginationRequest request, IQueryable<TEntity> query = null)
             where TEntity : class
             where TDTO : class
         {
             try
             {
-                IQueryable<TEntity> query = _context.Set<TEntity>();        /*.Clients.AsNoTracking().AsQueryable();*/
+                if (query is null)
+                {
+                    query = _context.Set<TEntity>();
+                }
 
                 PagedList<TEntity> list = await PagedList<TEntity>.ToPagedListAsync(query, request);
 
@@ -127,7 +133,8 @@ namespace OmniPyme.Web.Services
                     TotalPages = list.TotalPages,
                     CurrentPage = list.CurrentPage,
                     RecordsPerPage = list.RecordsPerPage,
-                    TotalRecords = list.TotalRecords
+                    TotalRecords = list.TotalRecords,
+                    Filter = request.Filter,
                 };
 
                 return ResponseHelper<PaginationResponse<TDTO>>.MakeResponseSuccess(response);

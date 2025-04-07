@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Humanizer;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -183,7 +184,17 @@ namespace OmniPyme.Web.Services
             //    return ResponseHelper<PaginationResponse<ClientDTO>>.MakeResponseFail(ex);
             //}
 
-            return await GetPaginationAsync<Client, ClientDTO>(request);
+            IQueryable<Client> query = _context.Clients.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.Filter))
+            {
+                query = query.Where(c => c.DNI.ToLower().Contains(request.Filter.ToLower())
+                                        || c.FirstName.ToLower().Contains(request.Filter.ToLower())
+                                        || c.LastName.ToLower().Contains(request.Filter.ToLower()));
+            }
+
+
+            return await GetPaginationAsync<Client, ClientDTO>(request, query);
         }
 
         //public async Task<Response<object>> ToggleAsync(ToggleClientStatusDTO dto)
