@@ -1,16 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace OmniPyme.Web.Data.Entities
 {
-    public class Client
+    public class Client : IId
     {
         [Key]
-        public int IdClient { get; set; }
+        public int Id { get; set; }
+
+        [MaxLength(32, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
+        [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        [Display(Name = "Cedula")]
+        public string DNI { get; set; }
 
         [MaxLength(32, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [Display(Name = "Nombres")]
         public string FirstName { get; set; } = null!;
+
 
         [MaxLength(32, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
@@ -35,7 +42,5 @@ namespace OmniPyme.Web.Data.Entities
         [Display(Name = "Fecha de ultima compra")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         public DateTime LastPurchaseDate { get; set; }
-
-
     }
 }

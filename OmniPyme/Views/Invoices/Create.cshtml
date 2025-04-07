@@ -1,0 +1,242 @@
+﻿@model OmniPyme.Web.ViewModels.InvoiceCreateViewModel
+@{
+	ViewData["Title"] = "Nueva Factura";
+}
+
+@section Styles {
+	<link href="~\lib\summernote\summernote-bs5.min.css" rel="stylesheet" />
+}
+
+<div class="pagetitle">
+	<h1>Clientes</h1>
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+			<li class="breadcrumb-item active"><a asp-action="Index">Facturas</a></li>
+			<li class="breadcrumb-item active">Nueva Factura</li>
+		</ol>
+	</nav>
+</div><!-- End Page Title -->
+
+<section class="section dashboard">
+    <form asp-action="Create" method="POST" id="invoiceForm">
+        <!-- Bloque 1: Información de la Factura -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title text-primary">Información de la Factura</h5>
+				<div class="row g-3">
+					<div class="col-md-6">
+						<div class="form-floating">
+							<input asp-for="InvoiceNumber" class="form-control bg-light text-muted" style="pointer-events: none;" readonly />
+							<label asp-for="InvoiceNumber">Número de Factura</label>
+							<span asp-validation-for="InvoiceNumber" class="text-danger"></span>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-floating">
+							<input asp-for="InvoiceDate" class="form-control bg-light text-muted" style="pointer-events: none;" readonly />
+							<label asp-for="InvoiceDate">Fecha de Factura</label>
+							<span asp-validation-for="InvoiceDate" class="text-danger"></span>
+						</div>
+					</div>
+
+					<div class="col-md-6">
+						<div class="form-floating">
+							<select asp-for="IdClient" asp-items="Model.Clients" class="form-control"></select>
+							<label asp-for="IdClient"></label>
+							<span asp-validation-for="IdClient" class="text-danger"></span>
+						</div>
+					</div>
+
+					<div class="col-md-6">
+						<div class="form-floating">
+							<select asp-for="SalePaymentMethod" class="form-select">
+								<option value="">Seleccione método de pago</option>
+								<option value="Efectivo">Efectivo</option>
+								<option value="Tarjeta">Tarjeta de Crédito/Débito</option>
+								<option value="Transferencia">Transferencia Bancaria</option>
+								<option value="Cheque">Cheque</option>
+							</select>
+							<label asp-for="SalePaymentMethod">Método de Pago</label>
+							<span asp-validation-for="SalePaymentMethod" class="text-danger"></span>
+						</div>
+					</div>
+
+					<div class="card mb-4">
+						<div class="card-body">
+							<h5 class="card-title text-primary">Detalle de la Venta</h5>
+
+							<div class="table-responsive">
+								<table class="table table-hover" id="saleDetailTable">
+									<thead>
+										<tr>
+											<th>Producto</th>
+											<th>Precio Unitario</th>
+											<th>Cantidad</th>
+											<th>Subtotal</th>
+											<th>Acciones</th>
+										</tr>
+									</thead>
+									<tbody>
+										@* Aqui se agregarán las filas dinámicamente *@
+									</tbody>
+								</table>
+							</div>
+
+							<div class="d-flex justify-content-end mb-4">
+								<button type="button" class="btn btn-success" onclick="agregarProducto()">
+									<i class="bi bi-plus-circle me-1"></i> Agregar Producto
+								</button>
+							</div>
+
+							<div class="mt-3">
+								<strong>Total: $<span id="totalVenta">0.00</span></strong>
+								<input type="hidden" name="SaleTotal" asp-for="SaleTotal" />
+							</div>
+
+							@* TODO: Estos campos se van a alojar en la tabla SaleDetail *@
+							@* <div class="row g-3 justify-content-end">
+								<div class="col-md-4">
+									<div class="form-floating">
+										<input asp-for="Subtotal" class="form-control" readonly />
+										<label asp-for="Subtotal">Subtotal</label>
+									</div>
+								</div>
+								TODO: Agregar impuestos a la tabla saleDetail para usar este input
+								<div class="col-md-4">
+									<div class="form-floating">
+										<input asp-for="Tax" class="form-control" readonly />
+										<label asp-for="Tax">Impuestos</label>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div class="form-floating">
+										<input asp-for="Total" class="form-control" readonly />
+										<label asp-for="Total">Total</label>
+									</div>
+								</div> *@
+
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save me-1"></i> Guardar Factura
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-x-circle me-1"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</section>
+
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script src="~\lib\summmernote\summernote-bs5.min.js"></script>
+	<script>
+		let rowIndex = 0;
+
+		// Crear la primera linea
+		document.addEventListener("DOMContentLoaded", function () {
+			agregarProducto();
+		});
+
+		// Agregar producto a la tabla
+		function agregarProducto() {
+			const table = document.getElementById("saleDetailTable").getElementsByTagName('tbody')[0];
+
+			let row = document.createElement("tr");
+			row.id = `row-${rowIndex}`;
+
+			row.innerHTML = `
+				<td>
+					<select name="SaleDetails[${rowIndex}].IdProduct" class="form-select product-select" required>
+						<option value="">Seleccione un producto</option>
+						<option value="1" data-price="1000">Producto A</option>
+						<option value="2" data-price="2500">Producto B</option>
+						<option value="3" data-price="5000">Producto C</option>
+						// TODO: Aquí se deben cargar los productos desde el servidor
+					</select>
+				</td>
+				<td>
+					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailProductPrice" class="form-control unit-price" readonly value="0" />
+				</td>
+				<td>
+					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailProductQuantity" class="form-control quantity" value="1" min="1" required />
+				</td>
+				<td>
+					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailSubtotal" class="form-control subtotal" readonly value="0" />
+				</td>
+				<td>
+					<button type="button" class="btn btn-danger btn-sm" onclick="removerProducto(${rowIndex})">
+						<i class="bi bi-trash"></i>
+					</button>
+				</td>
+			`;
+
+			table.appendChild(row);
+			rowIndex++;
+		}
+
+		// Remover producto de la tabla
+		function removerProducto(index) {
+			const row = document.getElementById(`row-${index}`);
+			if (row) row.remove();
+			actualizarTotalVenta();
+		}
+
+		// Actualizar el total de la venta
+		function actualizarTotalVenta() {
+			let total = 0;
+			document.querySelectorAll('.subtotal').forEach(input => {
+				total += parseFloat(input.value || 0);
+			});
+			document.getElementById('totalVenta').innerText = total.toFixed(2);
+			document.querySelector('input[name="SaleTotal"]').value = total.toFixed(2);
+		}
+
+		// Evento para calcular subtotal cuando cambia la cantidad
+		document.addEventListener("input", function (e) {
+			if (e.target && e.target.classList.contains("quantity")) {
+				const row = e.target.closest("tr");
+				const quantity = parseFloat(e.target.value);
+				const priceInput = row.querySelector(".unit-price");
+				const subtotalInput = row.querySelector(".subtotal");
+
+				const unitPrice = parseFloat(priceInput.value || 0);
+				const subtotal = quantity * unitPrice;
+				subtotalInput.value = subtotal.toFixed(2);
+				actualizarTotalVenta();
+			}
+		});
+
+		// Evento para actualizar precio y subtotal cuando se selecciona producto
+		document.addEventListener("change", function (e) {
+			if (e.target && e.target.classList.contains("product-select")) {
+				const row = e.target.closest("tr");
+				const selectedOption = e.target.options[e.target.selectedIndex];
+				const productId = selectedOption.value;
+
+				const priceInput = row.querySelector(".unit-price");
+				const quantityInput = row.querySelector(".quantity");
+				const subtotalInput = row.querySelector(".subtotal");
+
+				// Diccionario de precios generado desde Razor
+				let precios = {
+					"1": 1000,
+					"2": 2500,
+					"3": 5000
+					// TODO: Aquí se deben cargar los precios desde el servidor
+				};
+
+				const unitPrice = precios[productId] ?? 0;
+				priceInput.value = unitPrice;
+				subtotalInput.value = (unitPrice * parseFloat(quantityInput.value || 1)).toFixed(2);
+				actualizarTotalVenta();
+			}
+		});
+	</script>
+}

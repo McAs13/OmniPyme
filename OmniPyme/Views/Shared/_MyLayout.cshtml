@@ -6,6 +6,7 @@
 	<title>@ViewData["Title"] - OmniPyme</title>
 
 	@await Html.PartialAsync("_Styles")
+	@await RenderSectionAsync("Styles", required: false)
 
 </head>
 <body>
@@ -23,8 +24,9 @@
 	
 	@await Html.PartialAsync("_Scripts")
 
+	@await Component.InvokeAsync("Notyf")
+
 	@await RenderSectionAsync("Scripts", required: false)
 
-	@await Component.InvokeAsync("Notyf")
 </body>
 </html>
