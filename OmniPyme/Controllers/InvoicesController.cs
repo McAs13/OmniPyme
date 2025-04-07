@@ -10,21 +10,24 @@ using OmniPyme.Web.Services;
 using OmniPyme.Web.ViewModels;
 
 
+
 namespace OmniPyme.Web.Controllers
 {
     public class InvoicesController : Controller
     {
         private readonly IInvoicesService _invoicesService;
         private readonly ISalesService _salesService;
+        private readonly ISaleDetailService _saleDetailService;
         private readonly INotyfService _notyfService;
         private readonly ICombosHelper _combosHelper;
 
-        public InvoicesController(IInvoicesService invoicesService, INotyfService notyfService, ICombosHelper combosHelper, ISalesService salesService)
+        public InvoicesController(IInvoicesService invoicesService, INotyfService notyfService, ICombosHelper combosHelper, ISalesService salesService, ISaleDetailService saleDetailService)
         {
             _invoicesService = invoicesService;
             _notyfService = notyfService;
             _combosHelper = combosHelper;
             _salesService = salesService;
+            _saleDetailService = saleDetailService;
         }
 
         [HttpGet]
@@ -38,7 +41,7 @@ namespace OmniPyme.Web.Controllers
         public async Task<IActionResult> Create()
         {
             // Obtener el último registro ordenado por InvoiceNumber
-            var nextInvoiceNumber = await _invoicesService.GetNextInvoiceNumberAsync();
+            string nextInvoiceNumber = await _invoicesService.GetNextInvoiceNumberAsync();
 
             InvoiceCreateViewModel viewModel = new InvoiceCreateViewModel
             {
@@ -70,6 +73,14 @@ namespace OmniPyme.Web.Controllers
                 SalePaymentMethod = viewModel.SalePaymentMethod
             };
 
+            // Verificar que hay detalles de venta
+            if (viewModel.SaleDetails == null || !viewModel.SaleDetails.Any())
+            {
+                _notyfService.Error("La factura debe tener al menos un producto");
+                viewModel.Clients = await _combosHelper.GetComboCliente();
+                return View(viewModel);
+            }
+
             Response<SaleDTO> saleResponse = await _salesService.CreateAsync(dto);
 
             if (!saleResponse.IsSuccess)
@@ -80,6 +91,7 @@ namespace OmniPyme.Web.Controllers
             }
 
             viewModel.IdSale = saleResponse.Result.Id;
+            viewModel.SaleCode = saleResponse.Result.SaleCode;
 
             if (viewModel.IdSale == null)
             {
@@ -88,6 +100,25 @@ namespace OmniPyme.Web.Controllers
                 return View(viewModel);
             }
 
+            int detailCounter = 1;
+
+            foreach (SaleDetailViewModel detail in viewModel.SaleDetails)
+            {
+                detail.IdSale = viewModel.IdSale ?? 0;
+
+                string generatedDetailCode = $"{viewModel.SaleCode}-{detailCounter}";
+
+                await _saleDetailService.CreateAsync(new SaleDetailDTO
+                {
+                    IdSale = detail.IdSale,
+                    SaleDetailCode = generatedDetailCode,
+                    SaleDetailProductCode = detail.IdProduct,
+                    SaleDetailProductQuantity = detail.SaleDetailProductQuantity,
+                    SaleDetailProductPrice = (decimal)detail.SaleDetailProductPrice,
+                    SaleDetailSubtotal = (decimal)detail.SaleDetailSubtotal
+                });
+                detailCounter++;
+            }
 
             Response<InvoiceDTO> response = await _invoicesService.CreateAsync(new InvoiceDTO
             {
@@ -175,15 +206,57 @@ namespace OmniPyme.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            Response<object> response = await _invoicesService.DeleteAsync(id);
-            if (!response.IsSuccess)
+            //Response<object> response = await _invoicesService.DeleteAsync(id);
+            //if (!response.IsSuccess)
+            //{
+            //    _notyfService.Error(response.Message);
+            //}
+            //else
+            //{
+            //    _notyfService.Success(response.Message);
+            //}
+            //return RedirectToAction("Index");
+
+            // Obtener la factura para saber su IdSale asociado
+            Response<InvoiceDTO> invoiceResponse = await _invoicesService.GetOneAsync(id);
+
+            if (!invoiceResponse.IsSuccess)
             {
-                _notyfService.Error(response.Message);
+                _notyfService.Error("Error al obtener la factura: " + invoiceResponse.Message);
+                return RedirectToAction("Index");
+            }
+
+            int idSale = invoiceResponse.Result.IdSale;
+
+            //// Eliminar los detalles de la venta
+            //Response<List<SaleDetailDTO>> detailResponse = await _saleDetailService.GetBySaleIdAsync(idSale);
+            //if (detailResponse.IsSuccess)
+            //{
+            //    foreach (SaleDetailDTO detail in detailResponse.Result)
+            //    {
+            //        await _saleDetailService.DeleteAsync(detail.Id);
+            //    }
+            //}
+
+            // Eliminar la venta
+            Response<object> saleDeleteResponse = await _salesService.DeleteAsync(idSale);
+            if (!saleDeleteResponse.IsSuccess)
+            {
+                _notyfService.Error(saleDeleteResponse.Message);
+                return RedirectToAction("Index");
+            }
+
+            //// Eliminar la factura
+            //Response<object> invoiceDeleteResponse = await _invoicesService.DeleteAsync(id);
+            if (!saleDeleteResponse.IsSuccess)
+            {
+                _notyfService.Error(saleDeleteResponse.Message);
             }
             else
             {
-                _notyfService.Success(response.Message);
+                _notyfService.Success(saleDeleteResponse.Message);
             }
+
             return RedirectToAction("Index");
         }
     }

@@ -31,7 +31,7 @@ namespace OmniPyme.Web.Helpers
             list.Insert(0, new SelectListItem
             {
                 Text = "[Seleccione un cliente...]",
-                Value = "0"
+                Value = ""
             });
             return list;
         }

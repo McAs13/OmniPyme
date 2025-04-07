@@ -17,6 +17,7 @@ namespace OmniPyme.Web.ViewModels
 
         // Propiedades de Sale
         public int? IdSale { get; set; }
+        public string? SaleCode { get; set; }
         public DateTime SaleDate { get; set; } = DateTime.Now;
         public double SaleTotal { get; set; }
 
@@ -26,6 +27,7 @@ namespace OmniPyme.Web.ViewModels
 
         [Display(Name = "Cliente")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un cliente válido")]
         public int IdClient { get; set; }
         public int IdUser { get; set; }
 
@@ -46,8 +48,5 @@ namespace OmniPyme.Web.ViewModels
         public int SaleDetailProductQuantity { get; set; }
         public double SaleDetailProductPrice { get; set; }
         public double SaleDetailSubtotal { get; set; }
-
-        // Propiedades adicionales para la UI
-        public string ProductName { get; set; }
     }
 }

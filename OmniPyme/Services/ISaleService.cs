@@ -31,7 +31,7 @@ namespace OmniPyme.Web.Services
         {
             // Obtener el último registro ordenado por SaleCode
             Sale? lastSale = await _context.Sales
-                .OrderByDescending(s => s.SaleCode)
+                .OrderByDescending(s => s.Id)
                 .FirstOrDefaultAsync();
 
             string nextCode = "V001";

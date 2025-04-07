@@ -82,7 +82,12 @@
 								<td>@item.Sale.SaleTotal</td>
 
 								<td>
-									<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm"><i class="bi bi-pencil-fill"></i></a>
+									<form asp-action="View" style="display: contents;" method="POST">
+										<input type="hidden" value="@item.Id" name="InvoiceId" />
+										<button class="btn btn-sm btn-info">
+											<i class="bi bi-eye"></i>
+										</button>
+									</form>
 									<form asp-action="Delete" asp-route-id="@item.Id" style="display: contents;" method="post">
 										<button class="btn btn-danger btn-sm btnDelete"><i class="bi bi-trash-fill"></i></button>
 									</form>

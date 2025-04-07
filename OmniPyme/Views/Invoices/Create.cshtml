@@ -153,7 +153,7 @@
 
 			row.innerHTML = `
 				<td>
-					<select name="SaleDetails[${rowIndex}].ProductId" class="form-select product-select" required>
+					<select name="SaleDetails[${rowIndex}].IdProduct" class="form-select product-select" required>
 						<option value="">Seleccione un producto</option>
 						<option value="1" data-price="1000">Producto A</option>
 						<option value="2" data-price="2500">Producto B</option>
@@ -162,13 +162,13 @@
 					</select>
 				</td>
 				<td>
-					<input type="number" name="SaleDetails[${rowIndex}].UnitPrice" class="form-control unit-price" readonly value="0" />
+					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailProductPrice" class="form-control unit-price" readonly value="0" />
 				</td>
 				<td>
-					<input type="number" name="SaleDetails[${rowIndex}].Quantity" class="form-control quantity" value="1" min="1" required />
+					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailProductQuantity" class="form-control quantity" value="1" min="1" required />
 				</td>
 				<td>
-					<input type="number" name="SaleDetails[${rowIndex}].Subtotal" class="form-control subtotal" readonly value="0" />
+					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailSubtotal" class="form-control subtotal" readonly value="0" />
 				</td>
 				<td>
 					<button type="button" class="btn btn-danger btn-sm" onclick="removerProducto(${rowIndex})">

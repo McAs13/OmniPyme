@@ -22,6 +22,7 @@ namespace OmniPyme.Data
         }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Sale> Sales { get; set; }
+        public DbSet<SaleDetail> SaleDetails { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
 
     }

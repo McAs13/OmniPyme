@@ -28,6 +28,7 @@ namespace OmniPyme.Web.Data.Entities
         public string SaleCode { get; set; }
 
         [ForeignKey("Client")] // Indica que IdClient es la clave foránea
+        [Required(ErrorMessage = "El campo {0} es obligatorio")]
         public int IdClient { get; set; }
         public Client? Client { get; set; }  // Relación con la entidad Client
     }
