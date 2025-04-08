@@ -20,6 +20,7 @@ namespace OmniPyme.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            _notyfService.Information("It Works!");
             Response<List<RolDTO>> response = await _rolesService.GetListAsync();
             return View(response.Result);
         }
@@ -95,6 +96,20 @@ namespace OmniPyme.Web.Controllers
             {
                 _notyfService.Success(response.Message);
                 return RedirectToAction(nameof(Index));
+            }
+
+            _notyfService.Error(response.Message);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            Response<RolDTO> response = await _rolesService.GetOneAsync(id);
+
+            if (response.IsSuccess)
+            {
+                return View(response.Result);
             }
 
             _notyfService.Error(response.Message);
