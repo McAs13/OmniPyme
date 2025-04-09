@@ -35,7 +35,7 @@
 				<div class="col-md-6">
 					<div class="form-floating">
 						<input value="@Model.ClientName" class="form-control bg-light" readonly />
-						<label>Cliente</label>
+						<label asp-for="IdClient">Cliente</label>
 					</div>
 				</div>
 
@@ -59,28 +59,27 @@
 					<thead>
 						<tr>
 							<th>Producto</th>
-							<th>Precio Unitario</th>
 							<th>Cantidad</th>
+							<th>Precio Unitario</th>
+							<th>Impuesto</th>
 							<th>Subtotal</th>
 						</tr>
 					</thead>
 					<tbody>
-						@{
-							var nombresProductos = new Dictionary<int, string>
-							{
-								{ 1, "Producto A" },
-								{ 2, "Producto B" },
-								{ 3, "Producto C" }
-							};
-						}
 						@foreach (var detalle in Model.SaleDetails)
 						{
+							double TaxAmount = detalle.SaleDetailProductPrice * detalle.SaleDetailProductTax * detalle.SaleDetailProductQuantity;
 							<tr>
 								<td>
-									@nombresProductos.GetValueOrDefault(detalle.IdProduct, $"Producto {detalle.IdProduct}")
+									@{
+										var producto = Model.ProductList?.FirstOrDefault(p => p.Id == detalle.SaleDetailProductCode);
+										var nombreProducto = !string.IsNullOrWhiteSpace(producto?.ProductName) ? producto.ProductName : "Producto no encontrado";
+									}
+									@nombreProducto
 								</td>
-								<td>$@detalle.SaleDetailProductPrice.ToString("N2")</td>
 								<td>@detalle.SaleDetailProductQuantity</td>
+								<td>$@detalle.SaleDetailProductPrice.ToString("N2")</td>
+								<td>$@detalle.SaleDetailProductTax.ToString("N2")</td>
 								<td>$@detalle.SaleDetailSubtotal.ToString("N2")</td>
 							</tr>
 						}

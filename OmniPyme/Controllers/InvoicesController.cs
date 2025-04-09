@@ -20,14 +20,16 @@ namespace OmniPyme.Web.Controllers
         private readonly ISaleDetailService _saleDetailService;
         private readonly INotyfService _notyfService;
         private readonly ICombosHelper _combosHelper;
+        private readonly IProductsService _productsService;
 
-        public InvoicesController(IInvoicesService invoicesService, INotyfService notyfService, ICombosHelper combosHelper, ISalesService salesService, ISaleDetailService saleDetailService)
+        public InvoicesController(IInvoicesService invoicesService, INotyfService notyfService, ICombosHelper combosHelper, ISalesService salesService, ISaleDetailService saleDetailService, IProductsService productsService)
         {
             _invoicesService = invoicesService;
             _notyfService = notyfService;
             _combosHelper = combosHelper;
             _salesService = salesService;
             _saleDetailService = saleDetailService;
+            _productsService = productsService;
         }
 
         [HttpGet]
@@ -43,12 +45,15 @@ namespace OmniPyme.Web.Controllers
             // Obtener el último registro ordenado por InvoiceNumber
             string nextInvoiceNumber = await _invoicesService.GetNextInvoiceNumberAsync();
 
+            List<ProductDTO> products = await _productsService.GetProductListAsync();
+
             InvoiceViewModel viewModel = new InvoiceViewModel
             {
                 InvoiceNumber = nextInvoiceNumber,
                 InvoiceDate = DateTime.Now,
                 SaleDate = DateTime.Now,
-                Clients = await _combosHelper.GetComboCliente()
+                Clients = await _combosHelper.GetComboCliente(),
+                ProductList = products,
             };
             return View(viewModel);
         }
@@ -115,7 +120,8 @@ namespace OmniPyme.Web.Controllers
                     SaleDetailProductCode = detail.IdProduct,
                     SaleDetailProductQuantity = detail.SaleDetailProductQuantity,
                     SaleDetailProductPrice = (decimal)detail.SaleDetailProductPrice,
-                    SaleDetailSubtotal = (decimal)detail.SaleDetailSubtotal
+                    SaleDetailSubtotal = (decimal)detail.SaleDetailSubtotal,
+                    SaleDetailProductTax = (decimal)detail.SaleDetailProductTax
                 });
                 detailCounter++;
             }
@@ -262,6 +268,57 @@ namespace OmniPyme.Web.Controllers
             return RedirectToAction("Index");
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> View([FromRoute] int id)
+        //{
+        //    Response<InvoiceDTO> invoiceResponse = await _invoicesService.GetOneAsync(id);
+
+        //    if (!invoiceResponse.IsSuccess)
+        //    {
+        //        _notyfService.Error("Error al obtener la factura: " + invoiceResponse.Message);
+        //        return RedirectToAction("Index");
+        //    }
+
+        //    Response<List<SaleDetailDTO>> detailResponse = await _saleDetailService.GetBySaleIdAsync(invoiceResponse.Result.IdSale);
+        //    if (!detailResponse.IsSuccess)
+        //    {
+        //        _notyfService.Error("Error al obtener los detalles de la venta: " + detailResponse.Message);
+        //        return RedirectToAction("Index");
+        //    }
+
+        //    int idClient = invoiceResponse.Result.Sale.IdClient;
+        //    IEnumerable<SelectListItem> clientes = await _combosHelper.GetComboCliente();
+        //    SelectListItem clienteItem = clientes.FirstOrDefault(c => c.Value == idClient.ToString());
+        //    string clientName = clienteItem?.Text ?? "Cliente no encontrado";
+
+        //    InvoiceViewModel viewModel = new InvoiceViewModel
+        //    {
+        //        IdInvoice = invoiceResponse.Result.Id,
+        //        InvoiceNumber = invoiceResponse.Result.InvoiceNumber,
+        //        InvoiceDate = invoiceResponse.Result.InvoiceDate,
+        //        IdSale = invoiceResponse.Result.IdSale,
+        //        SaleCode = invoiceResponse.Result.Sale.SaleCode,
+        //        SaleDate = invoiceResponse.Result.Sale.SaleDate,
+        //        SaleTotal = (double)invoiceResponse.Result.Sale.SaleTotal,
+        //        SalePaymentMethod = invoiceResponse.Result.Sale.SalePaymentMethod,
+        //        IdClient = invoiceResponse.Result.Sale.IdClient,
+        //        ClientName = clientName,
+        //        SaleDetails = detailResponse.Result.Select(d => new SaleDetailViewModel
+        //        {
+        //            IdSaleDetail = d.Id,
+        //            IdSale = d.IdSale,
+        //            SaleDetailCode = d.SaleDetailCode,
+        //            IdProduct = d.SaleDetailProductCode,
+        //            SaleDetailProductCode = d.SaleDetailProductCode,
+        //            SaleDetailProductQuantity = d.SaleDetailProductQuantity,
+        //            SaleDetailProductPrice = (double)d.SaleDetailProductPrice,
+        //            SaleDetailProductTax = (double)d.SaleDetailProductTax,
+        //            SaleDetailSubtotal = (double)d.SaleDetailSubtotal
+        //        }).ToList()
+        //    };
+        //    return View(viewModel);
+        //}
+
         [HttpGet]
         public async Task<IActionResult> View([FromRoute] int id)
         {
@@ -279,6 +336,8 @@ namespace OmniPyme.Web.Controllers
                 _notyfService.Error("Error al obtener los detalles de la venta: " + detailResponse.Message);
                 return RedirectToAction("Index");
             }
+
+            List<ProductDTO> productList = await _productsService.GetProductListAsync();
 
             int idClient = invoiceResponse.Result.Sale.IdClient;
             IEnumerable<SelectListItem> clientes = await _combosHelper.GetComboCliente();
@@ -303,12 +362,17 @@ namespace OmniPyme.Web.Controllers
                     IdSale = d.IdSale,
                     SaleDetailCode = d.SaleDetailCode,
                     IdProduct = d.SaleDetailProductCode,
+                    SaleDetailProductCode = d.SaleDetailProductCode,
                     SaleDetailProductQuantity = d.SaleDetailProductQuantity,
                     SaleDetailProductPrice = (double)d.SaleDetailProductPrice,
+                    SaleDetailProductTax = (double)d.SaleDetailProductTax,
                     SaleDetailSubtotal = (double)d.SaleDetailSubtotal
-                }).ToList()
+                }).ToList(),
+                ProductList = productList
             };
+
             return View(viewModel);
         }
+
     }
 }

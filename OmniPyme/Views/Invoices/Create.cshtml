@@ -71,8 +71,9 @@
 									<thead>
 										<tr>
 											<th>Producto</th>
-											<th>Precio Unitario</th>
 											<th>Cantidad</th>
+											<th>Precio Unitario</th>
+											<th>Impuestos</th>
 											<th>Subtotal</th>
 											<th>Acciones</th>
 										</tr>
@@ -120,6 +121,9 @@
 		let rowIndex = 0;
 		let productosSeleccionados = new Set();
 
+		//Serializar los productos:a
+		const productos = @Html.Raw(Json.Serialize(Model.ProductList));
+
 		// Crear la primera linea
 		document.addEventListener("DOMContentLoaded", function () {
 			agregarProducto();
@@ -132,22 +136,27 @@
 			let row = document.createElement("tr");
 			row.id = `row-${rowIndex}`;
 
+			// Crear opciones del select desde la lista de productos
+			let optionsHtml = '<option value="">Seleccione un producto</option>';
+			productos.forEach(p => {
+				optionsHtml += `<option value="${p.id}" data-price="${p.productPrice}" data-tax="${p.productTax}">${p.productName}</option>`;
+			});
+
 			row.innerHTML = `
 				<td>
 					<select name="SaleDetails[${rowIndex}].IdProduct" class="form-select product-select" required>
-						<option value="">Seleccione un producto</option>
-						<option value="1" data-price="1000">Producto A</option>
-						<option value="2" data-price="2500">Producto B</option>
-						<option value="3" data-price="5000">Producto C</option>
-						// TODO: Aquí se deben cargar los productos desde el servidor
+						${optionsHtml}
 					</select>
 					<span class="text-danger product-error d-none">Debe seleccionar un producto</span>
+				</td>
+				<td>
+					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailProductQuantity" class="form-control quantity" value="1" min="1" required />
 				</td>
 				<td>
 					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailProductPrice" class="form-control unit-price" readonly value="0" />
 				</td>
 				<td>
-					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailProductQuantity" class="form-control quantity" value="1" min="1" required />
+					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailProductTax" class="form-control tax-value" readonly value="0" />
 				</td>
 				<td>
 					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailSubtotal" class="form-control subtotal" readonly value="0" />
@@ -219,9 +228,17 @@
 				const quantity = parseFloat(e.target.value);
 				const priceInput = row.querySelector(".unit-price");
 				const subtotalInput = row.querySelector(".subtotal");
+				const taxInput = row.querySelector(".tax-value");
+
+				const select = row.querySelector(".product-select");
+				const selectedOption = select.options[select.selectedIndex];
+				const tax = parseFloat(selectedOption?.getAttribute("data-tax")) || 0;
 
 				const unitPrice = parseFloat(priceInput.value || 0);
-				const subtotal = quantity * unitPrice;
+				const taxAmount = unitPrice * quantity * tax;
+				const subtotal = unitPrice * quantity + taxAmount;
+
+				taxInput.value = taxAmount.toFixed(2);
 				subtotalInput.value = subtotal.toFixed(2);
 				actualizarTotalVenta();
 			}
@@ -262,16 +279,20 @@
 				}
 
 				// Actualizar precio y subtotal
-				let precios = {
-					"1": 1000,
-					"2": 2500,
-					"3": 5000
-				};
-				const unitPrice = precios[productId] ?? 0;
-				priceInput.value = unitPrice;
-				subtotalInput.value = (unitPrice * parseFloat(quantityInput.value || 1)).toFixed(2);
-				actualizarTotalVenta();
+				const unitPrice = parseFloat(selectedOption.getAttribute("data-price")) || 0;
+				const tax = parseFloat(selectedOption.getAttribute("data-tax")) || 0;
+				const quantity = parseFloat(quantityInput.value || 1);
+				const taxInput = row.querySelector(".tax-value");
 
+
+				const taxAmount = unitPrice * quantity * tax;
+				const subtotal = (unitPrice * quantity) + taxAmount;
+
+				priceInput.value = unitPrice.toFixed(2);
+				taxInput.value = taxAmount.toFixed(2);
+				subtotalInput.value = subtotal.toFixed(2);
+
+				actualizarTotalVenta();
 				refrescarSelects();
 			}
 		});

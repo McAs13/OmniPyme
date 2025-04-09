@@ -38,7 +38,7 @@ namespace OmniPyme.Web.ViewModels
 
         // Propiedades para la UI (listas desplegables)
         public IEnumerable<SelectListItem>? Clients { get; set; }
-        public IEnumerable<SelectListItem>? Products { get; set; }
+        public List<ProductDTO>? ProductList { get; set; }
         public IEnumerable<SelectListItem>? PaymentMethods { get; set; }
     }
 
@@ -51,5 +51,7 @@ namespace OmniPyme.Web.ViewModels
         public double SaleDetailProductPrice { get; set; }
         public double SaleDetailSubtotal { get; set; }
         public string? SaleDetailCode { get; set; }
+        public double SaleDetailProductTax { get; set; }
+        public int? SaleDetailProductCode { get; set; }
     }
 }

@@ -94,7 +94,8 @@ namespace OmniPyme.Web.Services
                 {
                     Id = p.Id,
                     ProductName = p.ProductName,
-                    ProductPrice = p.ProductPrice
+                    ProductPrice = p.ProductPrice,
+                    ProductTax = p.ProductTax
                 }).ToListAsync();
         }
     }

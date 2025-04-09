@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OmniPyme.Data;
 
@@ -11,9 +12,11 @@ using OmniPyme.Data;
 namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250409201819_AddSaleDetailTaxField")]
+    partial class AddSaleDetailTaxField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,9 +234,8 @@ namespace OmniPyme.Web.Migrations
                     b.Property<int>("SaleDetailProductQuantity")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("SaleDetailProductTax")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("SaleDetailProductTax")
+                        .HasColumnType("float");
 
                     b.Property<decimal>("SaleDetailSubtotal")
                         .HasPrecision(18, 2)
@@ -242,8 +244,6 @@ namespace OmniPyme.Web.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IdSale");
-
-                    b.HasIndex("SaleDetailProductCode");
 
                     b.ToTable("SaleDetails");
                 });
@@ -288,14 +288,6 @@ namespace OmniPyme.Web.Migrations
                         .HasForeignKey("IdSale")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("OmniPyme.Web.Data.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("SaleDetailProductCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
 
                     b.Navigation("Sale");
                 });

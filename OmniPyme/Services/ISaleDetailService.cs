@@ -53,7 +53,8 @@ namespace OmniPyme.Web.Services
                     SaleDetailProductCode = detail.SaleDetailProductCode,
                     SaleDetailProductQuantity = detail.SaleDetailProductQuantity,
                     SaleDetailProductPrice = detail.SaleDetailProductPrice,
-                    SaleDetailSubtotal = detail.SaleDetailSubtotal
+                    SaleDetailSubtotal = detail.SaleDetailSubtotal,
+                    SaleDetailProductTax = detail.SaleDetailProductTax
                 };
                 saleDetailDTOs.Add(dto);
             }

@@ -17,7 +17,9 @@ namespace OmniPyme.Web.DTOs
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [Display(Name = "Metodo de pago")]
         public string SalePaymentMethod { get; set; } = null!;
-
+        [Display(Name = "Impuesto")]
+        [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        public double SaleDetailProductTax { get; set; }
         [Display(Name = "Total")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [Precision(18, 2)]
