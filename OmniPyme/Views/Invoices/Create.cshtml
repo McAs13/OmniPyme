@@ -1,4 +1,4 @@
-﻿@model OmniPyme.Web.ViewModels.InvoiceCreateViewModel
+﻿@model OmniPyme.Web.ViewModels.InvoiceViewModel
 @{
 	ViewData["Title"] = "Nueva Factura";
 }
@@ -8,7 +8,7 @@
 }
 
 <div class="pagetitle">
-	<h1>Clientes</h1>
+	<h1>Facturas</h1>
 	<nav>
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
@@ -89,33 +89,13 @@
 								</button>
 							</div>
 
-							<div class="mt-3">
+							<div class="mt-3 text-end">
 								<strong>Total: $<span id="totalVenta">0.00</span></strong>
 								<input type="hidden" name="SaleTotal" asp-for="SaleTotal" />
 							</div>
-
-							@* TODO: Estos campos se van a alojar en la tabla SaleDetail *@
-							@* <div class="row g-3 justify-content-end">
-								<div class="col-md-4">
-									<div class="form-floating">
-										<input asp-for="Subtotal" class="form-control" readonly />
-										<label asp-for="Subtotal">Subtotal</label>
-									</div>
-								</div>
-								TODO: Agregar impuestos a la tabla saleDetail para usar este input
-								<div class="col-md-4">
-									<div class="form-floating">
-										<input asp-for="Tax" class="form-control" readonly />
-										<label asp-for="Tax">Impuestos</label>
-									</div>
-								</div>
-								<div class="col-md-4">
-									<div class="form-floating">
-										<input asp-for="Total" class="form-control" readonly />
-										<label asp-for="Total">Total</label>
-									</div>
-								</div> *@
-
+						</div>
+					</div>
+				</div>
             </div>
         </div>
 
@@ -138,6 +118,7 @@
 	<script src="~\lib\summmernote\summernote-bs5.min.js"></script>
 	<script>
 		let rowIndex = 0;
+		let productosSeleccionados = new Set();
 
 		// Crear la primera linea
 		document.addEventListener("DOMContentLoaded", function () {
@@ -160,6 +141,7 @@
 						<option value="3" data-price="5000">Producto C</option>
 						// TODO: Aquí se deben cargar los productos desde el servidor
 					</select>
+					<span class="text-danger product-error d-none">Debe seleccionar un producto</span>
 				</td>
 				<td>
 					<input type="number" name="SaleDetails[${rowIndex}].SaleDetailProductPrice" class="form-control unit-price" readonly value="0" />
@@ -179,13 +161,33 @@
 
 			table.appendChild(row);
 			rowIndex++;
+
+			refrescarSelects();
 		}
 
 		// Remover producto de la tabla
 		function removerProducto(index) {
+			const tableBody = document.getElementById("saleDetailTable").getElementsByTagName('tbody')[0];
+			const rows = tableBody.querySelectorAll("tr");
+
+			// No permitir eliminar si solo hay una fila
+			if (rows.length <= 1) {
+				alert("Debe haber al menos un producto en la factura.");
+				return;
+			}
+
 			const row = document.getElementById(`row-${index}`);
-			if (row) row.remove();
+			if (!row) return;
+
+			const select = row.querySelector(".product-select");
+			const productId = select?.value;
+			if (productId) {
+				productosSeleccionados.delete(productId);
+			}
+
+			row.remove();
 			actualizarTotalVenta();
+			refrescarSelects(); // También refresca los selects al eliminar
 		}
 
 		// Actualizar el total de la venta
@@ -196,6 +198,18 @@
 			});
 			document.getElementById('totalVenta').innerText = total.toFixed(2);
 			document.querySelector('input[name="SaleTotal"]').value = total.toFixed(2);
+		}
+
+		// refrescar los select
+		function refrescarSelects() {
+			const allSelects = document.querySelectorAll(".product-select");
+			allSelects.forEach(select => {
+				const currentValue = select.value;
+				Array.from(select.options).forEach(option => {
+					if (option.value === "") return;
+					option.disabled = productosSeleccionados.has(option.value) && option.value !== currentValue;
+				});
+			});
 		}
 
 		// Evento para calcular subtotal cuando cambia la cantidad
@@ -216,27 +230,72 @@
 		// Evento para actualizar precio y subtotal cuando se selecciona producto
 		document.addEventListener("change", function (e) {
 			if (e.target && e.target.classList.contains("product-select")) {
-				const row = e.target.closest("tr");
-				const selectedOption = e.target.options[e.target.selectedIndex];
+				const select = e.target;
+				const row = select.closest("tr");
+				const selectedOption = select.options[select.selectedIndex];
 				const productId = selectedOption.value;
 
 				const priceInput = row.querySelector(".unit-price");
 				const quantityInput = row.querySelector(".quantity");
 				const subtotalInput = row.querySelector(".subtotal");
 
-				// Diccionario de precios generado desde Razor
+				// Restaurar producto anterior (si lo había)
+				const oldValue = select.getAttribute("data-old-value");
+				if (oldValue) productosSeleccionados.delete(oldValue);
+
+				// Agregar nuevo producto seleccionado
+				if (productId !== "") {
+					productosSeleccionados.add(productId);
+					select.setAttribute("data-old-value", productId);
+				} else {
+					select.removeAttribute("data-old-value");
+				}
+
+				// Validación visual
+				const errorSpan = select.parentElement.querySelector(".product-error");
+				if (productId !== "") {
+					errorSpan?.classList.add("d-none");
+					select.classList.remove("is-invalid");
+				} else {
+					errorSpan?.classList.remove("d-none");
+					select.classList.add("is-invalid");
+				}
+
+				// Actualizar precio y subtotal
 				let precios = {
 					"1": 1000,
 					"2": 2500,
 					"3": 5000
-					// TODO: Aquí se deben cargar los precios desde el servidor
 				};
-
 				const unitPrice = precios[productId] ?? 0;
 				priceInput.value = unitPrice;
 				subtotalInput.value = (unitPrice * parseFloat(quantityInput.value || 1)).toFixed(2);
 				actualizarTotalVenta();
+
+				refrescarSelects();
 			}
 		});
+
+		// Validar antes de enviar el formulario
+		document.getElementById("invoiceForm").addEventListener("submit", function (e) {
+			const selects = document.querySelectorAll(".product-select");
+			let productoSeleccionado = false;
+
+			selects.forEach(select => {
+				const errorSpan = select.parentElement.querySelector(".product-error");
+
+				if (select.value === "") {
+					errorSpan.classList.remove("d-none");
+				} else {
+					errorSpan.classList.add("d-none");
+					productoSeleccionado = true;
+				}
+			});
+
+			if (!productoSeleccionado) {
+				e.preventDefault(); // Bloquea el envío si ningún producto fue seleccionado
+			}
+		});
+
 	</script>
 }

@@ -43,7 +43,7 @@ namespace OmniPyme.Web.Controllers
             // Obtener el último registro ordenado por InvoiceNumber
             string nextInvoiceNumber = await _invoicesService.GetNextInvoiceNumberAsync();
 
-            InvoiceCreateViewModel viewModel = new InvoiceCreateViewModel
+            InvoiceViewModel viewModel = new InvoiceViewModel
             {
                 InvoiceNumber = nextInvoiceNumber,
                 InvoiceDate = DateTime.Now,
@@ -54,7 +54,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(InvoiceCreateViewModel viewModel)
+        public async Task<IActionResult> Create(InvoiceViewModel viewModel)
         {
 
             if (!ModelState.IsValid)
@@ -248,6 +248,8 @@ namespace OmniPyme.Web.Controllers
 
             //// Eliminar la factura
             //Response<object> invoiceDeleteResponse = await _invoicesService.DeleteAsync(id);
+
+            // Enviar la notificación de éxito o error
             if (!saleDeleteResponse.IsSuccess)
             {
                 _notyfService.Error(saleDeleteResponse.Message);
@@ -258,6 +260,55 @@ namespace OmniPyme.Web.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> View([FromRoute] int id)
+        {
+            Response<InvoiceDTO> invoiceResponse = await _invoicesService.GetOneAsync(id);
+
+            if (!invoiceResponse.IsSuccess)
+            {
+                _notyfService.Error("Error al obtener la factura: " + invoiceResponse.Message);
+                return RedirectToAction("Index");
+            }
+
+            Response<List<SaleDetailDTO>> detailResponse = await _saleDetailService.GetBySaleIdAsync(invoiceResponse.Result.IdSale);
+            if (!detailResponse.IsSuccess)
+            {
+                _notyfService.Error("Error al obtener los detalles de la venta: " + detailResponse.Message);
+                return RedirectToAction("Index");
+            }
+
+            int idClient = invoiceResponse.Result.Sale.IdClient;
+            IEnumerable<SelectListItem> clientes = await _combosHelper.GetComboCliente();
+            SelectListItem clienteItem = clientes.FirstOrDefault(c => c.Value == idClient.ToString());
+            string clientName = clienteItem?.Text ?? "Cliente no encontrado";
+
+            InvoiceViewModel viewModel = new InvoiceViewModel
+            {
+                IdInvoice = invoiceResponse.Result.Id,
+                InvoiceNumber = invoiceResponse.Result.InvoiceNumber,
+                InvoiceDate = invoiceResponse.Result.InvoiceDate,
+                IdSale = invoiceResponse.Result.IdSale,
+                SaleCode = invoiceResponse.Result.Sale.SaleCode,
+                SaleDate = invoiceResponse.Result.Sale.SaleDate,
+                SaleTotal = (double)invoiceResponse.Result.Sale.SaleTotal,
+                SalePaymentMethod = invoiceResponse.Result.Sale.SalePaymentMethod,
+                IdClient = invoiceResponse.Result.Sale.IdClient,
+                ClientName = clientName,
+                SaleDetails = detailResponse.Result.Select(d => new SaleDetailViewModel
+                {
+                    IdSaleDetail = d.Id,
+                    IdSale = d.IdSale,
+                    SaleDetailCode = d.SaleDetailCode,
+                    IdProduct = d.SaleDetailProductCode,
+                    SaleDetailProductQuantity = d.SaleDetailProductQuantity,
+                    SaleDetailProductPrice = (double)d.SaleDetailProductPrice,
+                    SaleDetailSubtotal = (double)d.SaleDetailSubtotal
+                }).ToList()
+            };
+            return View(viewModel);
         }
     }
 }

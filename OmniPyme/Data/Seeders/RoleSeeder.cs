@@ -35,7 +35,7 @@ namespace OmniPyme.Web.Data.Seeders
 
             foreach (Role role in roles)
             {
-                bool exists = await _context.Roles.AnyAsync(x => x.Id == role.Id);
+                bool exists = await _context.Roles.AnyAsync(x => x.RolName == role.RolName);
 
                 if (!exists)
                 {
