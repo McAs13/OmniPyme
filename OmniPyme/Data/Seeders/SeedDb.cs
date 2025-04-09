@@ -18,6 +18,8 @@ namespace OmniPyme.Web.Data.Seeders
             await new InvoiceSeeder(_context).SeedAsync();
             await new RoleSeeder(_context).SeedAsync();
             await new SaleDetailSeeder(_context).SeedAsync();
+            await new ProductCategorySeeder(_context).SeedAsync();
+            await new ProductSeeder(_context).SeedAsync();
         }
     }
 }

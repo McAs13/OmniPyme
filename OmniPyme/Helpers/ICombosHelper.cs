@@ -7,6 +7,8 @@ namespace OmniPyme.Web.Helpers
     public interface ICombosHelper
     {
         public Task<IEnumerable<SelectListItem>> GetComboCliente(int selectedId = 0);
+        public Task<IEnumerable<SelectListItem>> GetComboProductCategories(int selectedId = 0);
+        public Task<IEnumerable<SelectListItem>> GetComboProducts(int selectedId = 0);
     }
 
     public class CombosHelper : ICombosHelper
@@ -36,5 +38,42 @@ namespace OmniPyme.Web.Helpers
             return list;
         }
 
+        public async Task<IEnumerable<SelectListItem>> GetComboProductCategories(int selectedId = 0)
+        {
+            List<SelectListItem> list = await _context.ProductCategories
+                .Select(pc => new SelectListItem
+                {
+                    Text = pc.ProductCategoryName,
+                    Value = pc.Id.ToString(),
+                    Selected = pc.Id == selectedId
+                }).ToListAsync();
+
+            list.Insert(0, new SelectListItem
+            {
+                Text = "[Seleccione una categoría...]",
+                Value = ""
+            });
+
+            return list;
+        }
+
+        public async Task<IEnumerable<SelectListItem>> GetComboProducts(int selectedId = 0)
+        {
+            List<SelectListItem> list = await _context.Products
+                .Select(p => new SelectListItem
+                {
+                    Text = p.ProductName,
+                    Value = p.Id.ToString(),
+                    Selected = p.Id == selectedId
+                }).ToListAsync();
+
+            list.Insert(0, new SelectListItem
+            {
+                Text = "[Seleccione un producto...]",
+                Value = ""
+            });
+
+            return list;
+        }
     }
 }
