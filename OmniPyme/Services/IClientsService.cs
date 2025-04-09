@@ -190,7 +190,9 @@ namespace OmniPyme.Web.Services
             {
                 query = query.Where(c => c.DNI.ToLower().Contains(request.Filter.ToLower())
                                         || c.FirstName.ToLower().Contains(request.Filter.ToLower())
-                                        || c.LastName.ToLower().Contains(request.Filter.ToLower()));
+                                        || c.LastName.ToLower().Contains(request.Filter.ToLower())
+                                        || (c.FirstName + " " + c.LastName).ToLower().Contains(request.Filter.ToLower())
+                                        || (c.LastName + " " + c.FirstName).ToLower().Contains(request.Filter.ToLower()));
             }
 
 

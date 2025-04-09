@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace OmniPyme.Web.ViewModels
 {
-    public class InvoiceCreateViewModel
+    public class InvoiceViewModel
     {// Propiedades de Invoice
         public int? IdInvoice { get; set; }
 
@@ -29,6 +29,7 @@ namespace OmniPyme.Web.ViewModels
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un cliente válido")]
         public int IdClient { get; set; }
+        public string? ClientName { get; set; }
         public int IdUser { get; set; }
 
         // Lista de detalles de venta (productos)
@@ -48,5 +49,6 @@ namespace OmniPyme.Web.ViewModels
         public int SaleDetailProductQuantity { get; set; }
         public double SaleDetailProductPrice { get; set; }
         public double SaleDetailSubtotal { get; set; }
+        public string? SaleDetailCode { get; set; }
     }
 }
