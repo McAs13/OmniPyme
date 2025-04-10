@@ -9,8 +9,12 @@ namespace OmniPyme.Web.Core
         public AutoMapperProfiles()
         {
             CreateMap<Client, ClientDTO>().ReverseMap();
-            CreateMap<Role, RolDTO>().ReverseMap();
-
+            CreateMap<Role, RoleDTO>().ReverseMap();
+            CreateMap<Invoice, InvoiceDTO>().ReverseMap();
+            CreateMap<Sale, SaleDTO>().ReverseMap();
+            CreateMap<SaleDetail, SaleDetailDTO>().ReverseMap();
+            CreateMap<ProductCategory, ProductCategoryDTO>().ReverseMap();
+            CreateMap<Product, ProductDTO>().ReverseMap();
         }
     }
 }

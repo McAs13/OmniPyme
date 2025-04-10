@@ -2,10 +2,10 @@
 
 namespace OmniPyme.Web.Data.Entities
 {
-    public class Role
+    public class Role : IId
     {
         [Key]
-        public int IdRol { get; set; }
+        public int Id { get; set; }
 
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]

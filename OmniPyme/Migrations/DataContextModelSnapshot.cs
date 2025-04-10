@@ -24,11 +24,16 @@ namespace OmniPyme.Web.Migrations
 
             modelBuilder.Entity("OmniPyme.Web.Data.Entities.Client", b =>
                 {
-                    b.Property<int>("IdClient")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdClient"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DNI")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -56,27 +61,243 @@ namespace OmniPyme.Web.Migrations
                     b.Property<DateTime>("RegisterDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("IdClient");
+                    b.HasKey("Id");
+
+                    b.HasIndex("DNI")
+                        .IsUnique();
 
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Role", b =>
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Invoice", b =>
                 {
-                    b.Property<int>("IdRol")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IdSale")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("InvoiceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InvoiceNumber")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdSale");
+
+                    b.ToTable("Invoices");
+                });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IdProductCategory")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductBarCode")
+                        .IsRequired()
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<string>("ProductDescription")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<decimal>("ProductPrice")
+                        .HasMaxLength(32)
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<double>("ProductTax")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdProductCategory");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.ProductCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ProductCategoryName")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductCategories");
+                });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("RolName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("IdRol");
+                    b.HasKey("Id");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Sale", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IdClient")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SaleCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SaleDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SalePaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<decimal>("SaleTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdClient");
+
+                    b.ToTable("Sales");
+                });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.SaleDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IdSale")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SaleDetailCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SaleDetailProductCode")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SaleDetailProductPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SaleDetailProductQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SaleDetailProductTax")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("SaleDetailSubtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdSale");
+
+                    b.HasIndex("SaleDetailProductCode");
+
+                    b.ToTable("SaleDetails");
+                });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Invoice", b =>
+                {
+                    b.HasOne("OmniPyme.Web.Data.Entities.Sale", "Sale")
+                        .WithMany()
+                        .HasForeignKey("IdSale")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sale");
+                });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Product", b =>
+                {
+                    b.HasOne("OmniPyme.Web.Data.Entities.ProductCategory", "ProductCategory")
+                        .WithMany()
+                        .HasForeignKey("IdProductCategory")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductCategory");
+                });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.Sale", b =>
+                {
+                    b.HasOne("OmniPyme.Web.Data.Entities.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("IdClient")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("OmniPyme.Web.Data.Entities.SaleDetail", b =>
+                {
+                    b.HasOne("OmniPyme.Web.Data.Entities.Sale", "Sale")
+                        .WithMany()
+                        .HasForeignKey("IdSale")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OmniPyme.Web.Data.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("SaleDetailProductCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Sale");
                 });
 #pragma warning restore 612, 618
         }
