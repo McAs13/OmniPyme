@@ -1,6 +1,7 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using OmniPyme.Web.Core;
+using OmniPyme.Web.Core.Pagination;
 using OmniPyme.Web.DTOs;
 using OmniPyme.Web.Services;
 
@@ -18,13 +19,12 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
 
-            _notyfService.Information("It Works!");
+            // _notyfService.Information("It Works!");
 
-            Response<List<RoleDTO>> response = await _rolesService.GetListAsync();
-
+            Response<PaginationResponse<RoleDTO>> response = await _rolesService.GetPaginationAsync(request);
             return View(response.Result);
         }
 

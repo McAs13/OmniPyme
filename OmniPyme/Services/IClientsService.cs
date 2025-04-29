@@ -162,27 +162,8 @@ namespace OmniPyme.Web.Services
 
         public async Task<Response<PaginationResponse<ClientDTO>>> GetPaginationAsync(PaginationRequest request)
         {
-            //try
-            //{
-            //    IQueryable<Client> query = _context.Clients.AsNoTracking().AsQueryable();
-
-            //    PagedList<Client> list = await PagedList<Client>.ToPagedListAsync(query, request);
-
-            //    PaginationResponse<ClientDTO> response = new PaginationResponse<ClientDTO>
-            //    {
-            //        List = _mapper.Map<PagedList<ClientDTO>>(list),
-            //        TotalPages = list.TotalPages,
-            //        CurrentPage = list.CurrentPage,
-            //        RecordsPerPage = list.RecordsPerPage,
-            //        TotalRecords = list.TotalRecords
-            //    };
-
-            //    return ResponseHelper<PaginationResponse<ClientDTO>>.MakeResponseSuccess(response);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return ResponseHelper<PaginationResponse<ClientDTO>>.MakeResponseFail(ex);
-            //}
+          
+          
 
             IQueryable<Client> query = _context.Clients.AsNoTracking().AsQueryable();
 
@@ -199,33 +180,6 @@ namespace OmniPyme.Web.Services
             return await GetPaginationAsync<Client, ClientDTO>(request, query);
         }
 
-        //public async Task<Response<object>> ToggleAsync(ToggleClientStatusDTO dto)
-        //{
-        //    try
-        //    {
-        //        Response<ClientDTO> response = await GetOneAsync(dto.ClientId);
-
-        //        if (!response.IsSuccess)
-        //        {
-        //            return ResponseHelper<object>.MakeResponseFail($"No existe un cliente con id {dto.ClientId}");
-        //        }
-
-        //        Client client = _mapper.Map<Client>(response.Result);
-        //        client.Hide = dto.Hide;
-
-        //        //Lineas equivalentes
-        //        //_context.Clients.Update(client);
-        //        _context.Entry(client).State = EntityState.Modified;
-
-        //        await _context.SaveChangesAsync();
-
-        //        return ResponseHelper<object>.MakeResponseSuccess("Estado del cliente actualizado con éxito");
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return ResponseHelper<object>.MakeResponseFail(ex);
-        //    }
-        //}
+        
     }
 }

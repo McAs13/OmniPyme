@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using OmniPyme.Data;
 using OmniPyme.Web.Core;
+using OmniPyme.Web.Core.Pagination;
 using OmniPyme.Web.Data.Entities;
 using OmniPyme.Web.DTOs;
 using OmniPyme.Web.Helpers;
@@ -14,15 +15,17 @@ namespace OmniPyme.Web.Services
         Task<Response<object>> DeleteAsync(int id);
         Task<Response<RoleDTO>> EditAsync(RoleDTO dto);
         Task<Response<List<RoleDTO>>> GetListAsync();
+
         Task<Response<RoleDTO>> GetOneAsync(int id);
+        public Task<Response<PaginationResponse<RoleDTO>>> GetPaginationAsync(PaginationRequest request);
     }
 
-    public class RolesService : IRolesService
+    public class RolesService : CustomQueryableOperations, IRolesService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
 
-        public RolesService(DataContext context, IMapper mapper)
+        public RolesService(DataContext context, IMapper mapper) : base(context, mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -122,5 +125,21 @@ namespace OmniPyme.Web.Services
                 return ResponseHelper<RoleDTO>.MakeResponseFail(ex);
             }
         }
+
+        public async Task<Response<PaginationResponse<RoleDTO>>> GetPaginationAsync(PaginationRequest request)
+        {
+            IQueryable<Role> query = _context.Roles.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.Filter))
+            {
+                query = query.Where(c =>
+                    c.Id.ToString().ToLower().Contains(request.Filter.ToLower()) ||
+                    c.RolName.ToLower().Contains(request.Filter.ToLower()));
+            }
+
+            return await GetPaginationAsync<Role, RoleDTO>(request, query);
+        }
+
+      
     }
 }
