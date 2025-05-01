@@ -11,6 +11,6 @@ namespace OmniPyme.Web.DTOs
         [Display(Name = "Nombre del Rol")]
         [Required(ErrorMessage = "El campo Nombre del Rol es obligatorio")]
         [StringLength(100, ErrorMessage = "El Nombre del Rol no puede tener más de 100 caracteres")]
-        public string RolName { get; set; } = null!;
+        public string Name { get; set; } = null!;
     }
 }

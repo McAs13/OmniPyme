@@ -134,7 +134,7 @@ namespace OmniPyme.Web.Services
             {
                 query = query.Where(c =>
                     c.Id.ToString().ToLower().Contains(request.Filter.ToLower()) ||
-                    c.RolName.ToLower().Contains(request.Filter.ToLower()));
+                    c.Name.ToLower().Contains(request.Filter.ToLower()));
             }
 
             return await GetPaginationAsync<Role, RoleDTO>(request, query);

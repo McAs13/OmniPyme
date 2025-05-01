@@ -1,7 +1,9 @@
 ﻿using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OmniPyme.Data;
+using OmniPyme.Web.Data.Entities;
 using OmniPyme.Web.Data.Seeders;
 using OmniPyme.Web.Helpers;
 using OmniPyme.Web.Services;
@@ -24,6 +26,9 @@ namespace OmniPyme.Web
             //Services
             AddServices(builder);
 
+            //Identoty an Acces Managment
+            addIAM(builder);
+
             // Toast Notification SetUp
             builder.Services.AddNotyf(config =>
             {
@@ -32,8 +37,16 @@ namespace OmniPyme.Web
                 config.Position = NotyfPosition.BottomRight;
             });
 
+            //Log setup 
+           // AddLogConfiguration(builder);
+
             return builder;
         }
+
+        //private static void AddLogConfiguration(WebApplicationBuilder builder)
+        //{
+         //   throw new NotImplementedException();
+        //}
 
         private static void AddServices(WebApplicationBuilder builder)
         {
@@ -69,6 +82,31 @@ namespace OmniPyme.Web
                 SeedDb service = scope.ServiceProvider.GetService<SeedDb>();
                 service.SeedAsync().Wait();
             }
+        }
+
+        private static void addIAM(WebApplicationBuilder builder)
+        {
+            builder.Services.AddIdentity<Users, Role>(conf =>
+            {
+                conf.User.RequireUniqueEmail = true;
+                conf.Password.RequireDigit = false;
+                conf.Password.RequiredUniqueChars = 0;
+                conf.Password.RequireLowercase = false;
+                conf.Password.RequireUppercase = false;
+                conf.Password.RequireNonAlphanumeric = false;
+                conf.Password.RequiredLength = 4;
+            }).AddEntityFrameworkStores<DataContext>()
+              .AddDefaultTokenProviders();
+
+            builder.Services.ConfigureApplicationCookie( conf=>
+            {
+                conf.Cookie.Name = "Auth";
+                conf.ExpireTimeSpan = TimeSpan.FromDays(100);
+                conf.LoginPath = "/Account/Login";
+                conf.AccessDeniedPath = "/Account/NotAuthorized";
+            
+            });
+                
         }
     }
 }

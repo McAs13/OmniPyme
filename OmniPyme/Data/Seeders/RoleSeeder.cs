@@ -21,21 +21,21 @@ namespace OmniPyme.Web.Data.Seeders
             {
                 new Role
                 {
-                    RolName = "Administrador"
+                    Name = "Administrador"
                 },
                 new Role
                 {
-                    RolName = "Vendedor"
+                    Name = "Vendedor"
                 },
                 new Role
                 {
-                    RolName = "Gerente"
+                    Name = "Gerente"
                 }
             };
 
             foreach (Role role in roles)
             {
-                bool exists = await _context.Roles.AnyAsync(x => x.RolName == role.RolName);
+                bool exists = await _context.Roles.AnyAsync(x => x.Name == role.Name);
 
                 if (!exists)
                 {
@@ -47,3 +47,4 @@ namespace OmniPyme.Web.Data.Seeders
         }
     }
 }
+

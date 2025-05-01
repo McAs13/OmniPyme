@@ -1,15 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace OmniPyme.Web.Data.Entities
 {
-    public class Role : IId
+    public class Role : IdentityRole<int>, IId
     {
         [Key]
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
-        [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Display(Name = "Nombre del Rol")]
-        public string RolName { get; set; } = null!;
+        public override string Name { get; set; } = null!;
+
+        public ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
     }
 }
