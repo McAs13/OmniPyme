@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using OmniPyme.Models;
+using Serilog;
 
 namespace OmniPyme.Controllers;
 
@@ -15,6 +16,23 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
+        //Log.Warning("Log de advertencia");
+        //Log.Error("Log de error");
+        //Log.Fatal("Log fatal");
+        //Log.Information("Log de información");
+        //Log.Debug("Log de depuración");
+
+        //try
+        //{
+        //    int a = 13;
+        //    int b = 0;
+        //    int c = a / b; // Esto generará una excepción de división por cero
+
+        //}
+        //catch (Exception ex)
+        //{
+        //    Log.Error(ex, "Ha ocurrido un error en HomeController.Index");
+        //}
         return View();
     }
 

@@ -195,6 +195,7 @@ namespace OmniPyme.Web.Services
                                         || (c.LastName + " " + c.FirstName).ToLower().Contains(request.Filter.ToLower()));
             }
 
+            query = query.OrderBy(c => c.Id);
 
             return await GetPaginationAsync<Client, ClientDTO>(request, query);
         }
