@@ -98,8 +98,6 @@ namespace OmniPyme.Web.Services
                                             .ToLower()));
             }
 
-            query = query.OrderBy(i => i.InvoiceDate);
-
             return await GetPaginationAsync<Invoice, InvoiceDTO>(request, query);
         }
 
