@@ -5,6 +5,7 @@ using OmniPyme.Data;
 using OmniPyme.Web.Data.Seeders;
 using OmniPyme.Web.Helpers;
 using OmniPyme.Web.Services;
+using Serilog;
 
 namespace OmniPyme.Web
 {
@@ -32,7 +33,21 @@ namespace OmniPyme.Web
                 config.Position = NotyfPosition.BottomRight;
             });
 
+            //Log Setup
+            AddLogConfiguration(builder);
+
             return builder;
+        }
+
+        private static void AddLogConfiguration(WebApplicationBuilder builder)
+        {
+            Log.Logger = new LoggerConfiguration().WriteTo.File("logs/log.log",
+                                                                rollingInterval: RollingInterval.Day,
+                                                                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning)
+                                                  .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
+                                                  .CreateLogger();
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog();
         }
 
         private static void AddServices(WebApplicationBuilder builder)
@@ -46,6 +61,7 @@ namespace OmniPyme.Web
             builder.Services.AddScoped<IProductCategoriesService, ProductCategoriesService>();
             builder.Services.AddScoped<IProductsService, ProductsService>();
             builder.Services.AddTransient<SeedDb>();
+            builder.Services.AddTransient<IReadLogsService, ReadPlainTextLogsService>();
 
             //Helpers
             builder.Services.AddScoped<ICombosHelper, CombosHelper>();
