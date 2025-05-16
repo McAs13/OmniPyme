@@ -137,9 +137,11 @@ namespace OmniPyme.Web.Services
                     c.RolName.ToLower().Contains(request.Filter.ToLower()));
             }
 
+            query = query.OrderBy(c => c.Id);
+
             return await GetPaginationAsync<Role, RoleDTO>(request, query);
         }
 
-      
+
     }
 }
