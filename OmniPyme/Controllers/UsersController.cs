@@ -119,6 +119,7 @@ namespace PrivateBlog.Web.Controllers
 
             _notifyService.Success(response.Message);
             return RedirectToAction(nameof(Index));
+            /**/
         }
 
 
