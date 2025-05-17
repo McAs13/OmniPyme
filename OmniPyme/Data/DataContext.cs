@@ -4,7 +4,7 @@ using OmniPyme.Web.Data.Entities;
 
 namespace OmniPyme.Data
 {
-    public class DataContext : IdentityDbContext<Users, Role, int>
+    public class DataContext : IdentityDbContext<Users>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
@@ -18,11 +18,11 @@ namespace OmniPyme.Data
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
 
-        // Acceso a la tabla AspNetUsers
-        public DbSet<Users> ApplicationUsers => Users;
+        public DbSet<PrivateURole> PrivateURoles  { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            ConfigureKeys(builder);
             base.OnModelCreating(builder);
 
             ConfigureIndexes(builder);
@@ -35,17 +35,30 @@ namespace OmniPyme.Data
                 .IsUnique();
         }
 
+        private void ConfigureKeys(ModelBuilder builder)
+        {
+            // ROle Permissions
+            builder.Entity<RolePermission>().HasKey(rp => new { rp.Roleid, rp.permissionId });
+
+            builder.Entity<RolePermission>().HasOne(rp => rp.Role)
+                                            .WithMany(r => r.RolePermissions)
+                                            .HasForeignKey(rp => rp.Roleid);
+
+
+        }
+
         private void ConfigureIndexes(ModelBuilder builder)
         {
-            builder.Entity<Role>()
-                .HasIndex(r => r.Name)
-                .IsUnique();
+            //ROle
+            builder.Entity<PrivateURole>().HasIndex(r => r.Name).IsUnique();
+            //User
+            builder.Entity<Users>().HasIndex(r => r.Document).IsUnique();
         }
 
         private void ConfigureRolePermissionRelations(ModelBuilder builder)
         {
             builder.Entity<RolePermission>()
-                .HasKey(rp => new { rp.Roleid, rp.permissionid });
+                .HasKey(rp => new { rp.Roleid, rp.permissionId });
 
             builder.Entity<RolePermission>()
                 .HasOne(rp => rp.Role)
@@ -55,16 +68,16 @@ namespace OmniPyme.Data
             builder.Entity<RolePermission>()
                 .HasOne(rp => rp.Permission)
                 .WithMany(p => p.RolePermissions)
-                .HasForeignKey(rp => rp.permissionid);
+                .HasForeignKey(rp => rp.permissionId);
         }
 
         private void ConfigureUserToRoleRelation(ModelBuilder builder)
         {
             // Evita el conflicto de cascadas múltiples
             builder.Entity<Users>()
-                .HasOne(u => u.Role)
+                .HasOne(u => u.PrivateURole)
                 .WithMany()
-                .HasForeignKey(u => u.Roleid)
+                .HasForeignKey(u => u.PrivateURoleId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

@@ -1,23 +1,25 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Newtonsoft.Json;
 using OmniPyme.Data;
-using OmniPyme.Web.Core;
 using OmniPyme.Web.Core.Pagination;
+using OmniPyme.Web.Core;
 using OmniPyme.Web.Data.Entities;
-using OmniPyme.Web.DTOs;
 using OmniPyme.Web.Helpers;
+using OmniPyme.Web.DTOs;
+using static OmniPyme.Web.DTOs.PrivateURoleDTO;
 
 namespace OmniPyme.Web.Services
 {
     public interface IRolesService
     {
-        Task<Response<RoleDTO>> CreateAsync(RoleDTO dto);
-        Task<Response<object>> DeleteAsync(int id);
-        Task<Response<RoleDTO>> EditAsync(RoleDTO dto);
-        Task<Response<List<RoleDTO>>> GetListAsync();
-
-        Task<Response<RoleDTO>> GetOneAsync(int id);
-        public Task<Response<PaginationResponse<RoleDTO>>> GetPaginationAsync(PaginationRequest request);
+        Task<Response<PaginationResponse<PrivateURoleDTO>>> GetPaginationAsync(PaginationRequest request);
+        Task<Response<PrivateURoleDTO>> GetOneAsync(int id);
+        Task<Response<List<PermissionDTO>>> GetPermissionsAsync();
+        Task<Response<PrivateURoleDTO>> CreateAsync(PrivateURoleDTO dto);
+        Task<Response<PrivateURoleDTO>> EditAsync(PrivateURoleDTO dto);
+        Task<Response<List<PermissionForRoleDTO>>> GetPermissionsByRoleAsync(int id);
     }
 
     public class RolesService : CustomQueryableOperations, IRolesService
@@ -31,115 +33,141 @@ namespace OmniPyme.Web.Services
             _mapper = mapper;
         }
 
-        public async Task<Response<RoleDTO>> CreateAsync(RoleDTO dto)
+        public async Task<Response<PrivateURoleDTO>> CreateAsync(PrivateURoleDTO dto)
+        {
+            using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+            { 
+                try
+                {
+                    PrivateURole role = _mapper.Map<PrivateURole>(dto);
+                    await _context.PrivateURoles.AddAsync(role);
+                    await _context.SaveChangesAsync();
+
+                    int roleId = role.Id;
+                    List<int>? permissionIds = !string.IsNullOrWhiteSpace(dto.PermissionIds)
+                        ? JsonConvert.DeserializeObject<List<int>>(dto.PermissionIds)
+                        : new List<int>();
+
+                    foreach (int permissionId in permissionIds)
+                    {
+                        await _context.RolePermissions.AddAsync(new RolePermission
+                        {
+                            Roleid = roleId,
+                            permissionId = permissionId
+                        });
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return ResponseHelper<PrivateURoleDTO>.MakeResponseSuccess(dto, "Rol creado con éxito");
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    return ResponseHelper<PrivateURoleDTO>.MakeResponseFail(ex);
+                }
+            } 
+        }
+
+        public async Task<Response<PrivateURoleDTO>> EditAsync(PrivateURoleDTO dto)
         {
             try
             {
-                Role role = _mapper.Map<Role>(dto);
-                await _context.AddAsync(role);
+                if (dto.Name == Env.SUPER_ADMIN_ROLE_NAME)
+                    return ResponseHelper<PrivateURoleDTO>.MakeResponseFail($"El rol '{Env.SUPER_ADMIN_ROLE_NAME}' no puede ser editado");
+
+                List<int>? permissionIds = !string.IsNullOrWhiteSpace(dto.PermissionIds)
+                    ? JsonConvert.DeserializeObject<List<int>>(dto.PermissionIds)
+                    : new List<int>();
+
+                var oldPermissions = await _context.RolePermissions.Where(rp => rp.Roleid == dto.Id).ToListAsync();
+                _context.RolePermissions.RemoveRange(oldPermissions);
+
+                foreach (int permId in permissionIds)
+                {
+                    await _context.RolePermissions.AddAsync(new RolePermission
+                    {
+                        Roleid = dto.Id,
+                        permissionId = permId
+                    });
+                }
+
+                var roleEntity = _mapper.Map<PrivateURole>(dto);
+                _context.PrivateURoles.Update(roleEntity);
+
                 await _context.SaveChangesAsync();
-                return ResponseHelper<RoleDTO>.MakeResponseSuccess(dto, "Rol creado con éxito");
+                return ResponseHelper<PrivateURoleDTO>.MakeResponseSuccess(dto, "Rol actualizado con éxito");
             }
             catch (Exception ex)
             {
-                return ResponseHelper<RoleDTO>.MakeResponseFail(ex);
+                return ResponseHelper<PrivateURoleDTO>.MakeResponseFail(ex);
             }
         }
 
-        public async Task<Response<object>> DeleteAsync(int id)
+        public async Task<Response<PaginationResponse<PrivateURoleDTO>>> GetPaginationAsync(PaginationRequest request)
+        {
+            IQueryable<PrivateURole> query = _context.PrivateURoles.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(request.Filter))
+            {
+                query = query.Where(r => r.Name.ToLower().Contains(request.Filter.ToLower()));
+            }
+
+            return await GetPaginationAsync<PrivateURole, PrivateURoleDTO>(request, query);
+        }
+
+        public async Task<Response<PrivateURoleDTO>> GetOneAsync(int id)
         {
             try
             {
-                Response<RoleDTO> response = await GetOneAsync(id);
+                var role = await _context.PrivateURoles.FirstOrDefaultAsync(r => r.Id == id);
+                if (role == null)
+                    return ResponseHelper<PrivateURoleDTO>.MakeResponseFail($"El rol con id '{id}' no existe.");
 
+                var permissions = await _context.Permissions
+                    .Select(p => new PermissionForRoleDTO
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Description = p.Description,
+                        Module = p.Module,
+                        Selected = _context.RolePermissions.Any(rp => rp.permissionId == p.Id && rp.Roleid == role.Id)
+                    }).ToListAsync();
+
+                var dto = new PrivateURoleDTO
+                {
+                    Id = role.Id,
+                    Name = role.Name,
+                    Permissions = permissions
+                };
+
+                return ResponseHelper<PrivateURoleDTO>.MakeResponseSuccess(dto);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHelper<PrivateURoleDTO>.MakeResponseFail(ex);
+            }
+        }
+
+        public async Task<Response<List<PermissionDTO>>> GetPermissionsAsync()
+        {
+            return await GetCompleteList<Permission, PermissionDTO>();
+        }
+
+        public async Task<Response<List<PermissionForRoleDTO>>> GetPermissionsByRoleAsync(int id)
+        {
+            try
+            {
+                var response = await GetOneAsync(id);
                 if (!response.IsSuccess)
-                {
-                    return ResponseHelper<object>.MakeResponseFail(response.Message);
-                }
+                    return ResponseHelper<List<PermissionForRoleDTO>>.MakeResponseFail(response.Message);
 
-                Role role = _mapper.Map<Role>(response.Result);
-                _context.Roles.Remove(role);
-                await _context.SaveChangesAsync();
-
-                return ResponseHelper<object>.MakeResponseSuccess("Rol eliminado con éxito");
+                return ResponseHelper<List<PermissionForRoleDTO>>.MakeResponseSuccess(response.Result.Permissions);
             }
             catch (Exception ex)
             {
-                return ResponseHelper<object>.MakeResponseFail(ex);
+                return ResponseHelper<List<PermissionForRoleDTO>>.MakeResponseFail(ex);
             }
         }
-
-        public async Task<Response<RoleDTO>> EditAsync(RoleDTO dto)
-        {
-            try
-            {
-                Response<RoleDTO> response = await GetOneAsync(dto.Id);
-
-                if (!response.IsSuccess)
-                {
-                    return response;
-                }
-
-                Role role = _mapper.Map<Role>(dto);
-                _context.Entry(role).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-
-                return ResponseHelper<RoleDTO>.MakeResponseSuccess(dto, "Rol actualizado con éxito");
-            }
-            catch (Exception ex)
-            {
-                return ResponseHelper<RoleDTO>.MakeResponseFail(ex);
-            }
-        }
-
-        public async Task<Response<List<RoleDTO>>> GetListAsync()
-        {
-            try
-            {
-                List<Role> roles = await _context.Roles.ToListAsync();
-                List<RoleDTO> list = _mapper.Map<List<RoleDTO>>(roles);
-                return ResponseHelper<List<RoleDTO>>.MakeResponseSuccess(list);
-            }
-            catch (Exception ex)
-            {
-                return ResponseHelper<List<RoleDTO>>.MakeResponseFail(ex);
-            }
-        }
-
-        public async Task<Response<RoleDTO>> GetOneAsync(int id)
-        {
-            try
-            {
-                Role? role = await _context.Roles.AsNoTracking().FirstOrDefaultAsync(r => r.Id == id);
-
-                if (role is null)
-                {
-                    return ResponseHelper<RoleDTO>.MakeResponseFail($"Rol con id {id} no encontrado");
-                }
-
-                RoleDTO dto = _mapper.Map<RoleDTO>(role);
-                return ResponseHelper<RoleDTO>.MakeResponseSuccess(dto, "Rol obtenido con éxito");
-            }
-            catch (Exception ex)
-            {
-                return ResponseHelper<RoleDTO>.MakeResponseFail(ex);
-            }
-        }
-
-        public async Task<Response<PaginationResponse<RoleDTO>>> GetPaginationAsync(PaginationRequest request)
-        {
-            IQueryable<Role> query = _context.Roles.AsNoTracking().AsQueryable();
-
-            if (!string.IsNullOrEmpty(request.Filter))
-            {
-                query = query.Where(c =>
-                    c.Id.ToString().ToLower().Contains(request.Filter.ToLower()) ||
-                    c.Name.ToLower().Contains(request.Filter.ToLower()));
-            }
-
-            return await GetPaginationAsync<Role, RoleDTO>(request, query);
-        }
-
-      
     }
 }

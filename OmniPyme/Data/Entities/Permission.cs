@@ -7,10 +7,17 @@ namespace OmniPyme.Web.Data.Entities
         [Key]
         public int Id { get; set; }
 
-        [Display(Name = "Nombre del Rol")]
-        [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
+        [Display(Name = "Rol")]
+        [MaxLength(64, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
-        public string PermisionName { get; set; } = null!;
+        public string Name { get; set; } = null!;
+
+        
+
+        [Display(Name = "Descripción")]
+        [MaxLength(512, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
+        [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        public string Description { get; set; } = null!;
 
 
         [Display(Name = "Módulo")]
@@ -18,7 +25,7 @@ namespace OmniPyme.Web.Data.Entities
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         public string Module { get; set; } = null!;
 
-        public ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
+        public ICollection<RolePermission>? RolePermissions { get; set; } 
 
 
     }

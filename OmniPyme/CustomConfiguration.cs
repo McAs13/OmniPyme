@@ -7,6 +7,7 @@ using OmniPyme.Web.Data.Entities;
 using OmniPyme.Web.Data.Seeders;
 using OmniPyme.Web.Helpers;
 using OmniPyme.Web.Services;
+using Serilog;
 
 namespace OmniPyme.Web
 {
@@ -20,6 +21,8 @@ namespace OmniPyme.Web
                 options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection"));
             });
 
+            builder.Services.AddHttpContextAccessor();
+
             //AutoMapper
             builder.Services.AddAutoMapper(typeof(Program));
 
@@ -27,7 +30,7 @@ namespace OmniPyme.Web
             AddServices(builder);
 
             //Identoty an Acces Managment
-            addIAM(builder);
+            AddIAM(builder);
 
             // Toast Notification SetUp
             builder.Services.AddNotyf(config =>
@@ -52,12 +55,13 @@ namespace OmniPyme.Web
         {
             //Services
             builder.Services.AddScoped<IClientsService, ClientsService>();
-            builder.Services.AddScoped<IRolesService, RolesService>();
+            builder.Services.AddScoped<IUsersService, UsersService>();
             builder.Services.AddScoped<IInvoicesService, InvoicesService>();
             builder.Services.AddScoped<ISalesService, SalesService>();
             builder.Services.AddScoped<ISaleDetailService, SaleDetailService>();
             builder.Services.AddScoped<IProductCategoriesService, ProductCategoriesService>();
             builder.Services.AddScoped<IProductsService, ProductsService>();
+            builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddTransient<SeedDb>();
 
             //Helpers
@@ -84,9 +88,9 @@ namespace OmniPyme.Web
             }
         }
 
-        private static void addIAM(WebApplicationBuilder builder)
+        private static void AddIAM(WebApplicationBuilder builder)
         {
-            builder.Services.AddIdentity<Users, Role>(conf =>
+            builder.Services.AddIdentity<Users, IdentityRole>(conf =>
             {
                 conf.User.RequireUniqueEmail = true;
                 conf.Password.RequireDigit = false;
@@ -103,10 +107,14 @@ namespace OmniPyme.Web
                 conf.Cookie.Name = "Auth";
                 conf.ExpireTimeSpan = TimeSpan.FromDays(100);
                 conf.LoginPath = "/Account/Login";
-                conf.AccessDeniedPath = "/Account/NotAuthorized";
+                conf.AccessDeniedPath = "/Errors/403";
             
             });
                 
         }
+
+      
+
+       
     }
 }

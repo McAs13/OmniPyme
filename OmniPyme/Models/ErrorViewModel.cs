@@ -1,4 +1,4 @@
-namespace OmniPyme.Models
+﻿namespace OmniPyme.Models
 {
     public class ErrorViewModel
     {

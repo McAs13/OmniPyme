@@ -4,34 +4,31 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OmniPyme.Web.Data.Entities
 {
-    public class Users : IdentityUser<int>
+    public class Users : IdentityUser
     {
-        
+        [Display(Name = "Documento")]
+        [MaxLength(32, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
+        [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        public string Document { get; set; } = null!;
+
+        [Display(Name = "Nombres")]
         [MaxLength(45, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
-        [Display(Name = "Nombres")]
         public string FirstName { get; set; } = null!;
 
+        [Display(Name = "Apellidos")]
         [MaxLength(45, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
-        [Display(Name = "Apellidos")]
         public string LastName { get; set; } = null!;
 
-        [Display(Name = "Último acceso")]
-        public DateTime? UserLastAccess { get; set; }
+        public int PrivateURoleId { get; set; }
+
+        public  PrivateURole PrivateURole { get; set; }
+
+        public string FullName => $"{FirstName} {LastName}";
 
 
-
-        // ✔ Relación con la entidad Role
-        [Display(Name = "Rol")]
-        public int Roleid { get; set; }
-
-        [ForeignKey(nameof(Roleid))]
-        public Role Role { get; set; } = null!;
-
-        // ✔ Propiedad calculada
-        [NotMapped]
-        public string FullName => $"{FirstName}{LastName}";
+   
 
     }
 }

@@ -1,4 +1,7 @@
-﻿<!-- ======= Sidebar ======= -->
+﻿@inject OmniPyme.Web.Services.IUsersService _usersService
+
+
+<!-- ======= Sidebar ======= -->
 <aside id="sidebar" class="sidebar">
 
 	<ul class="sidebar-nav" id="sidebar-nav">
@@ -10,24 +13,33 @@
 			</a>
 		</li><!-- End Dashboard Nav -->
 
+		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowClient", "Client"))
+		{
+			
+		
 		<li class="nav-item">
 			<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Clients" ? "" : "collapsed") active" asp-controller="Clients" asp-action="Index">
 				<i class="bi bi-person"></i>
 				<span>Clientes</span>
 			</a>
 		</li>
+		
+		}
 
-		
-		
-		<li class="nav-item">
-			<a class="nav-link @(ViewData["ActivePage"] as string == "Roles" ? "" : "collapsed") active" asp-controller="Roles" asp-action="Index">
-				<i class="bi bi-people"></i>
-				<span>Roles</span>
-			</a>
-		</li>
+		@if (await _usersService.CurrentUserIsAuthorizedAsync("showRoles", "Roles"))
+		{
 
-	
-		
+			<li class="nav-item">
+				<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Roles" ? "" : "collapsed") active" asp-controller="Roles"  asp-action="Index">
+					<i class="bi bi-shield-lock"></i>
+					<span>Roles</span>
+				</a>
+			</li>
+		}
+
+		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowSale", "factura"))
+		{
+
 
 		<li class="nav-item">
 			<a class="nav-link @(ViewData["ActivePage"] as string == "Invoices" ? "" : "collapsed") active" asp-controller="Invoices" asp-action="Index">
@@ -36,13 +48,24 @@
 			</a>
 		</li>
 
+		}
+	
+		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowShowProductCategory", "ProductCategory"))
+		{
+
+
 		<li class="nav-item">
 			<a class="nav-link @(ViewData["ActivePage"] as string == "ProductCategories" ? "" : "collapsed") active" asp-controller="ProductCategories" asp-action="Index">
 				<i class="bi bi-box"></i>
 				<span>Categoria de producto</span>
 			</a>
 		</li>
-		
+
+		}
+
+		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowProduct", "Product"))
+		{
+
 		<li class="nav-item">
 			<a class="nav-link @(ViewData["ActivePage"] as string == "Products" ? "" : "collapsed") active" asp-controller="Products" asp-action="Index">
 				<i class="bi bi-box"></i>
@@ -51,7 +74,21 @@
 		</li>
 
 
+		}
 
+		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowUsers", "Users"))
+		{
+
+			<li class="nav-item">
+				<a class="nav-link @(ViewData["ActivePage"] as string == "Users" ? "" : "collapsed") active" asp-controller="Users" asp-action="Index">
+					<i class="bi bi-person"></i>
+					<span>Usuarios</span>
+				</a>
+			</li>
+
+
+		}
+		
 	</ul>
 
 </aside><!-- End Sidebar-->
