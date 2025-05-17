@@ -42,7 +42,7 @@
 
 
 		<li class="nav-item">
-			<a class="nav-link @(ViewData["ActivePage"] as string == "Invoices" ? "" : "collapsed") active" asp-controller="Invoices" asp-action="Index">
+			<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Invoices" ? "" : "collapsed") active" asp-controller="Invoices" asp-action="Index">
 				<i class="bi bi-file-earmark-spreadsheet"></i>
 				<span>Facturas</span>
 			</a>
@@ -55,8 +55,8 @@
 
 
 		<li class="nav-item">
-			<a class="nav-link @(ViewData["ActivePage"] as string == "ProductCategories" ? "" : "collapsed") active" asp-controller="ProductCategories" asp-action="Index">
-				<i class="bi bi-box"></i>
+			<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString()  == "ProductCategories" ? "" : "collapsed") active" asp-controller="ProductCategories" asp-action="Index">
+				<i class="bi bi-tags"></i>
 				<span>Categoria de producto</span>
 			</a>
 		</li>
@@ -67,7 +67,7 @@
 		{
 
 		<li class="nav-item">
-			<a class="nav-link @(ViewData["ActivePage"] as string == "Products" ? "" : "collapsed") active" asp-controller="Products" asp-action="Index">
+			<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Products" ? "" : "collapsed") active" asp-controller="Products" asp-action="Index">
 				<i class="bi bi-box"></i>
 				<span>Productos</span>
 			</a>

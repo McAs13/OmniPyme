@@ -168,6 +168,10 @@ namespace OmniPyme.Web.Services
             {
                 return ResponseHelper<List<PermissionForRoleDTO>>.MakeResponseFail(ex);
             }
+
+            return await GetPaginationAsync<Role, RoleDTO>(request, query);
         }
+
+      
     }
 }

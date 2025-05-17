@@ -84,6 +84,8 @@ namespace OmniPyme.Web.Services
                     p.ProductCategory!.ProductCategoryName.Contains(request.Filter));
             }
 
+            query = query.OrderBy(p => p.ProductName);
+
             return await GetPaginationAsync<Product, ProductDTO>(request, query);
         }
 

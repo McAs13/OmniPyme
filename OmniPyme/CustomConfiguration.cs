@@ -63,6 +63,7 @@ namespace OmniPyme.Web
             builder.Services.AddScoped<IProductsService, ProductsService>();
             builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddTransient<SeedDb>();
+            builder.Services.AddTransient<IReadLogsService, ReadPlainTextLogsService>();
 
             //Helpers
             builder.Services.AddScoped<ICombosHelper, CombosHelper>();
