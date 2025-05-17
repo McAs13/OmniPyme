@@ -1,10 +1,13 @@
 ﻿using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OmniPyme.Data;
+using OmniPyme.Web.Data.Entities;
 using OmniPyme.Web.Data.Seeders;
 using OmniPyme.Web.Helpers;
 using OmniPyme.Web.Services;
+using Serilog;
 
 namespace OmniPyme.Web
 {
@@ -18,11 +21,16 @@ namespace OmniPyme.Web
                 options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection"));
             });
 
+            builder.Services.AddHttpContextAccessor();
+
             //AutoMapper
             builder.Services.AddAutoMapper(typeof(Program));
 
             //Services
             AddServices(builder);
+
+            //Identoty an Acces Managment
+            AddIAM(builder);
 
             // Toast Notification SetUp
             builder.Services.AddNotyf(config =>
@@ -32,19 +40,28 @@ namespace OmniPyme.Web
                 config.Position = NotyfPosition.BottomRight;
             });
 
+            //Log setup 
+           // AddLogConfiguration(builder);
+
             return builder;
         }
+
+        //private static void AddLogConfiguration(WebApplicationBuilder builder)
+        //{
+         //   throw new NotImplementedException();
+        //}
 
         private static void AddServices(WebApplicationBuilder builder)
         {
             //Services
             builder.Services.AddScoped<IClientsService, ClientsService>();
-            builder.Services.AddScoped<IRolesService, RolesService>();
+            builder.Services.AddScoped<IUsersService, UsersService>();
             builder.Services.AddScoped<IInvoicesService, InvoicesService>();
             builder.Services.AddScoped<ISalesService, SalesService>();
             builder.Services.AddScoped<ISaleDetailService, SaleDetailService>();
             builder.Services.AddScoped<IProductCategoriesService, ProductCategoriesService>();
             builder.Services.AddScoped<IProductsService, ProductsService>();
+            builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddTransient<SeedDb>();
 
             //Helpers
@@ -70,5 +87,34 @@ namespace OmniPyme.Web
                 service.SeedAsync().Wait();
             }
         }
+
+        private static void AddIAM(WebApplicationBuilder builder)
+        {
+            builder.Services.AddIdentity<Users, IdentityRole>(conf =>
+            {
+                conf.User.RequireUniqueEmail = true;
+                conf.Password.RequireDigit = false;
+                conf.Password.RequiredUniqueChars = 0;
+                conf.Password.RequireLowercase = false;
+                conf.Password.RequireUppercase = false;
+                conf.Password.RequireNonAlphanumeric = false;
+                conf.Password.RequiredLength = 4;
+            }).AddEntityFrameworkStores<DataContext>()
+              .AddDefaultTokenProviders();
+
+            builder.Services.ConfigureApplicationCookie( conf=>
+            {
+                conf.Cookie.Name = "Auth";
+                conf.ExpireTimeSpan = TimeSpan.FromDays(100);
+                conf.LoginPath = "/Account/Login";
+                conf.AccessDeniedPath = "/Errors/403";
+            
+            });
+                
+        }
+
+      
+
+       
     }
 }

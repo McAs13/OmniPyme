@@ -1,6 +1,9 @@
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OmniPyme.Data;
 using OmniPyme.Web;
+using OmniPyme.Web.Data.Entities; // Asegúrate de importar esto
+
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection"));
 });
+
 
 builder.AddCustomConfiguration();
 
@@ -28,14 +32,28 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseAuthentication();
 app.UseRouting();
-
 app.UseAuthorization();
+
+app.UseStatusCodePagesWithReExecute("/Errors/{0}");
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.AddCustomWebApplicationConfiguration();
+
+// Ejecutar Seeder
+/*
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<Users>>();
+    var roleManager = services.GetRequiredService<RoleManager<Role>>();
+
+    await DataSeeder.SeedAsync(userManager, roleManager);
+}
+*/
 
 app.Run();

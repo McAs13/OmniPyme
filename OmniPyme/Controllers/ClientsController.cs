@@ -1,13 +1,18 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OmniPyme.Web.Core;
 using OmniPyme.Web.Core.Pagination;
+using OmniPyme.Web.Data.Entities;
 using OmniPyme.Web.DTOs;
 using OmniPyme.Web.Services;
+using OmniPyme.Web.Core.Attributes;
+using System.Runtime.ConstrainedExecution;
 
 namespace OmniPyme.Web.Controllers
 {
+    
     public class ClientsController : Controller
     {
         private readonly IClientsService _clientsService;
@@ -20,6 +25,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
+        [CustomAuthorize(permission:"showClient", module: "Client")]
         public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
             Response<PaginationResponse<ClientDTO>> response = await _clientsService.GetPaginationAsync(request);
@@ -27,6 +33,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
+        [CustomAuthorize(permission: "createClient", module: "Client")]
         public IActionResult Create()
         {
             ClientDTO model = new ClientDTO
@@ -59,6 +66,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
+        [CustomAuthorize(permission: "updateClient", module: "Client")]
         public async Task<IActionResult> Edit([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -99,6 +107,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
+        [CustomAuthorize(permission: "deleteClient", module: "Client")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             Response<object> response = await _clientsService.DeleteAsync(id);
