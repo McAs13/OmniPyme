@@ -34,6 +34,8 @@ namespace OmniPyme.Web.Services
         public Task<bool> CheckPasswordAsync(Users user, string currentPassword);
         public Task<string> GeneratePasswordResetTokenAsync(Users user);
         public Task<IdentityResult> ResetPasswordAsync(Users user, string resetToken, string newPassword);
+        public Task<int> CountByRoleAsync(string role);
+
 
     }
 
@@ -79,6 +81,11 @@ namespace OmniPyme.Web.Services
         public async Task<IdentityResult> ConfirmEmailAsync(Users users, string token)
         {
             return await _userManager.ConfirmEmailAsync(users, token);
+        }
+
+        public async Task<int> CountByRoleAsync(string role)
+        {
+            return await _context.Users.CountAsync(u => u.PrivateURole.Name == role);
         }
 
         public async Task<Response<UsersDTO>> CreateAsync(UsersDTO dto)

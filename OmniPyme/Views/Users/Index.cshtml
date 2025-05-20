@@ -22,10 +22,10 @@
     <div class="card">
         <div class="card-header">
 
-            
+
                 <div class="row">
 				    <h3 class="m-0 font-weight-bold text-primary col-md-11">Usuarios</h3>
-                    @if (await _usersService.CurrentUserIsAuthorizedAsync("createUsers", "Usuarios"))
+                @if (await _usersService.CurrentUserIsAuthorizedAsync("CreateUsers", "Users"))
 				    {
                         <div class="col-md-1">
                             <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i></a>
@@ -96,12 +96,12 @@
                         <td>@item.Email</td>
                         <td>
 
-                            @if (await _usersService.CurrentUserIsAuthorizedAsync("updateUsers", "Usuarios"))
+                                @if (await _usersService.CurrentUserIsAuthorizedAsync("UpdateUsers", "Users"))
                             {
                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning"><i class="bi bi-pencil-fill"></i></a>
                             }
 
-                            @if (await _usersService.CurrentUserIsAuthorizedAsync("deleteUsers", "Usuarios"))
+                                @if (await _usersService.CurrentUserIsAuthorizedAsync("DeleteUsers", "Users"))
                             {
                                 <form asp-action="Delete" asp-route-id="@item.Id" style="display: contents;">
                                     <button class="btn btn-sm btn-danger btnDelete"><i class="bi bi-trash-fill"></i></button>

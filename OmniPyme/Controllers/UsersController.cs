@@ -30,7 +30,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
-        [CustomAuthorize(permission: "showUsers", module: "Usuarios")]
+        [CustomAuthorize(permission: "ShowUsers", module: "Users")]
         [Authorize]
         public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
@@ -39,7 +39,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
-        [CustomAuthorize(permission: "createUsers", module: "Usuarios")]
+        [CustomAuthorize(permission: "CreateUsers", module: "Users")]
         [Authorize]
         public async Task<IActionResult> Create()
         {
@@ -54,7 +54,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
-        [CustomAuthorize(permission: "createUsers", module: "Usuarios")]
+        [CustomAuthorize(permission: "CreateUsers", module: "Users")]
         [Authorize]
         public async Task<IActionResult> Create(UsersDTO dto)
         {
@@ -78,10 +78,8 @@ namespace OmniPyme.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-
         [HttpGet]
-        [CustomAuthorize(permission: "updateUsers", module: "Usuarios")]
+        [CustomAuthorize(permission: "UpdateUsers", module: "Users")]
         [Authorize]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -103,7 +101,7 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
-        [CustomAuthorize(permission: "updateUsers", module: "Usuarios")]
+        [CustomAuthorize(permission: "UpdateUsers", module: "Users")]
         [Authorize]
         public async Task<IActionResult> Edit(UsersDTO dto)
         {
@@ -132,6 +130,32 @@ namespace OmniPyme.Web.Controllers
         [Authorize]
         public async Task<IActionResult> Delete([FromRoute] string id)
         {
+            if (!Guid.TryParse(id, out Guid userId))
+            {
+                _notifyService.Error("ID de usuario inválido.");
+                return RedirectToAction(nameof(Index));
+            }
+            //Validar que haya por lo menos un administrador
+            Users userToDelete = await _usersService.GetUserAsync(userId);
+            if (userToDelete == null)
+            {
+                _notifyService.Error("Usuario no encontrado.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Validar si es administrador y si hay más de uno
+            if (userToDelete.PrivateURole?.Name == "Admin") // Ajusta si usas una propiedad diferente
+            {
+                var adminCount = await _usersService.CountByRoleAsync("Admin");
+                if (adminCount <= 1)
+                {
+                    _notifyService.Error("Debe haber al menos un administrador en el sistema.");
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+
+            //proceder a la eliminacion
             Response<object> response = await _usersService.DeleteAsync(id);
 
             if (response.IsSuccess)
