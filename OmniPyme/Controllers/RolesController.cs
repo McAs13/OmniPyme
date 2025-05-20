@@ -1,4 +1,5 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using AspNetCoreHero.ToastNotification.Notyf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OmniPyme.Web.Core;
@@ -170,6 +171,25 @@ namespace OmniPyme.Web.Controllers
         }
 
 
-        //TODO: Falta el metodo para eliminar roles
+        [HttpPost]
+        [CustomAuthorize(permission: "DeleteRoles", module: "Roles")]
+        [Authorize]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            Response<object> response = await _rolesService.DeleteAsync(id);
+
+            if (response.IsSuccess)
+            {
+                _notifyService.Success(response.Message);
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                _notifyService.Error(response.Message);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

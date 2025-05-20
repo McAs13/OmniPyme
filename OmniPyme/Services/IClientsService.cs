@@ -20,8 +20,6 @@ namespace OmniPyme.Web.Services
         public Task<Response<List<ClientDTO>>> GetListAsync();
         public Task<Response<ClientDTO>> GetOneAsync(int id);
         public Task<Response<PaginationResponse<ClientDTO>>> GetPaginationAsync(PaginationRequest request);
-
-        //public Task<Response<object>> ToggleAsync(ToggleClientStatusDTO dto); //No se usa en esta clase pero se puede implementar en el futuro
     }
 
     public class ClientsService : CustomQueryableOperations, IClientsService
@@ -37,54 +35,11 @@ namespace OmniPyme.Web.Services
 
         public async Task<Response<ClientDTO>> CreateAsync(ClientDTO dto)
         {
-            //try
-            //{
-            //    Client client = _mapper.Map<Client>(dto);
-
-            //    await _context.AddAsync(client);
-            //    await _context.SaveChangesAsync();
-
-            //    return ResponseHelper<ClientDTO>.MakeResponseSuccess(dto, "Cliente creado con éxito");
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (ex.InnerException is SqlException sqlEx && sqlEx.Message.Contains("IX_Clients_DNI"))
-            //    {
-            //        return ResponseHelper<ClientDTO>.MakeResponseFail("El documento ya está registrado en el sistema.");
-            //    }
-
-            //    return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
-            //}
-
             return await CreateAsync<Client, ClientDTO>(dto);
         }
 
         public async Task<Response<object>> DeleteAsync(int id)
         {
-            //try
-            //{
-            //    Response<ClientDTO> response = await GetOneAsync(id);
-
-            //    if (!response.IsSuccess)
-            //    {
-            //        return ResponseHelper<object>.MakeResponseFail(response.Message);
-            //    }
-
-            //    Client client = _mapper.Map<Client>(response.Result);
-            //    _context.Clients.Remove(client);
-            //    //TODO: Validar si esto se puede hacer o es mas optimo el de arriba
-            //    //_context.Clients.Remove(_mapper.Map<Client>(response.Result));
-
-            //    await _context.SaveChangesAsync();
-
-            //    return ResponseHelper<object>.MakeResponseSuccess("Cliente eliminado con éxito");
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    return ResponseHelper<object>.MakeResponseFail(ex);
-            //}
-
             Response<object> response = await DeleteAsync<Client>(id);
             response.Message = !response.IsSuccess ? $"El cliente con id: {id} no existe" : response.Message;
             return response;
@@ -92,32 +47,6 @@ namespace OmniPyme.Web.Services
 
         public async Task<Response<ClientDTO>> EditAsync(ClientDTO dto)
         {
-            //try
-            //{
-            //    Response<ClientDTO> responseDto = await GetOneAsync(dto.Id);
-
-            //    if (!responseDto.IsSuccess)
-            //    {
-            //        return responseDto;
-            //    }
-
-            //    Client client = _mapper.Map<Client>(dto);
-
-            //    _context.Entry(client).State = EntityState.Modified;
-            //    await _context.SaveChangesAsync();
-
-            //    return ResponseHelper<ClientDTO>.MakeResponseSuccess(dto, "Cliente actualizado con éxito");
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (ex.InnerException is SqlException sqlEx && sqlEx.Message.Contains("IX_Clients_DNI"))
-            //    {
-            //        return ResponseHelper<ClientDTO>.MakeResponseFail("El documento ya está registrado en el sistema.");
-            //    }
-
-            //    return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
-            //}
-
             return await EditAsync<Client, ClientDTO>(dto, dto.Id);
         }
 
@@ -139,31 +68,13 @@ namespace OmniPyme.Web.Services
 
         public async Task<Response<ClientDTO>> GetOneAsync(int id)
         {
-            //try
-            //{
-            //    Client? client = await _context.Clients.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
-
-            //    if (client is null)
-            //    {
-            //        return ResponseHelper<ClientDTO>.MakeResponseFail($"Cliente con id {id} no encontrado");
-            //    }
-
-            //    ClientDTO dto = _mapper.Map<ClientDTO>(client);
-
-            //    return ResponseHelper<ClientDTO>.MakeResponseSuccess(dto, "Cliente obtenido con éxito");
-            //}
-            //catch (Exception ex)
-            //{
-            //    return ResponseHelper<ClientDTO>.MakeResponseFail(ex);
-            //}
-
             return await GetOneAsync<Client, ClientDTO>(id);
         }
 
         public async Task<Response<PaginationResponse<ClientDTO>>> GetPaginationAsync(PaginationRequest request)
         {
-          
-          
+
+
 
             IQueryable<Client> query = _context.Clients.AsNoTracking().AsQueryable();
 
@@ -181,6 +92,6 @@ namespace OmniPyme.Web.Services
             return await GetPaginationAsync<Client, ClientDTO>(request, query);
         }
 
-        
+
     }
 }

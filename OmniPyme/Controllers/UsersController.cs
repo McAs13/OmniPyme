@@ -127,6 +127,24 @@ namespace OmniPyme.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        //TODO: Falta el metodo para eliminar usuarios
+        [HttpPost]
+        [CustomAuthorize(permission: "DeleteUsers", module: "Users")]
+        [Authorize]
+        public async Task<IActionResult> Delete([FromRoute] string id)
+        {
+            Response<object> response = await _usersService.DeleteAsync(id);
+
+            if (response.IsSuccess)
+            {
+                _notifyService.Success(response.Message);
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                _notifyService.Error(response.Message);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

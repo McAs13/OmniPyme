@@ -26,6 +26,8 @@ namespace OmniPyme.Web.Services
         public Task LogoutAsync();
         public Task<Response<PaginationResponse<UsersDTO>>> GetPaginationAsync(PaginationRequest request);
         public Task<Response<UsersDTO>> CreateAsync(UsersDTO dto);
+
+        public Task<Response<object>> DeleteAsync(string id);
         public Task<Users?> GetUserAsync(Guid id);
         public Task<Response<UsersDTO>> UpdateUserAsync(UsersDTO dto);
         public Task<int> UpdateUserAsync(AccountUserDTO dto);
@@ -131,6 +133,28 @@ namespace OmniPyme.Web.Services
             return await _context.Permissions.Include(p => p.RolePermissions)
                                              .AnyAsync(p => (p.Module == module && p.Name == permission)
                                                             && p.RolePermissions.Any(rp => rp.Roleid == users.PrivateURoleId));
+        }
+
+        public async Task<Response<object>> DeleteAsync(string id)
+        {
+            Users? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id.ToString());
+            if (user == null)
+            {
+                return new Response<object>
+                {
+                    IsSuccess = false,
+                    Message = $"El usuario con id: {id} no existe"
+                };
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return new Response<object>
+            {
+                IsSuccess = true,
+                Message = "Usuario eliminado con éxito"
+            };
         }
 
         public async Task<string> GenerateEmailConfirmationTokenAsync(Users users)

@@ -14,12 +14,13 @@ namespace OmniPyme.Web.Services
 {
     public interface IRolesService
     {
-        Task<Response<PaginationResponse<PrivateURoleDTO>>> GetPaginationAsync(PaginationRequest request);
-        Task<Response<PrivateURoleDTO>> GetOneAsync(int id);
-        Task<Response<List<PermissionDTO>>> GetPermissionsAsync();
-        Task<Response<PrivateURoleDTO>> CreateAsync(PrivateURoleDTO dto);
-        Task<Response<PrivateURoleDTO>> EditAsync(PrivateURoleDTO dto);
-        Task<Response<List<PermissionForRoleDTO>>> GetPermissionsByRoleAsync(int id);
+        public Task<Response<PaginationResponse<PrivateURoleDTO>>> GetPaginationAsync(PaginationRequest request);
+        public Task<Response<PrivateURoleDTO>> GetOneAsync(int id);
+        public Task<Response<List<PermissionDTO>>> GetPermissionsAsync();
+        public Task<Response<PrivateURoleDTO>> CreateAsync(PrivateURoleDTO dto);
+        public Task<Response<object>> DeleteAsync(int id);
+        public Task<Response<PrivateURoleDTO>> EditAsync(PrivateURoleDTO dto);
+        public Task<Response<List<PermissionForRoleDTO>>> GetPermissionsByRoleAsync(int id);
     }
 
     public class RolesService : CustomQueryableOperations, IRolesService
@@ -169,6 +170,35 @@ namespace OmniPyme.Web.Services
             catch (Exception ex)
             {
                 return ResponseHelper<List<PermissionForRoleDTO>>.MakeResponseFail(ex);
+            }
+        }
+
+        public async Task<Response<object>> DeleteAsync(int id)
+        {
+            using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                PrivateURole role = await _context.PrivateURoles.FirstOrDefaultAsync(r => r.Id == id);
+                if (role == null)
+                    return ResponseHelper<object>.MakeResponseFail($"El rol con id '{id}' no existe.");
+
+                if (role.Name == Env.SUPER_ADMIN_ROLE_NAME)
+                    return ResponseHelper<object>.MakeResponseFail($"El rol '{Env.SUPER_ADMIN_ROLE_NAME}' no puede ser eliminado.");
+
+                List<RolePermission> rolePermissions = await _context.RolePermissions.Where(rp => rp.Roleid == id).ToListAsync();
+                _context.RolePermissions.RemoveRange(rolePermissions);
+
+                _context.PrivateURoles.Remove(role);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return ResponseHelper<object>.MakeResponseSuccess(null, "Rol eliminado con éxito");
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return ResponseHelper<object>.MakeResponseFail(ex);
             }
         }
     }
