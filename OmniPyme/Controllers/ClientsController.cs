@@ -12,7 +12,7 @@ using System.Runtime.ConstrainedExecution;
 
 namespace OmniPyme.Web.Controllers
 {
-    
+
     public class ClientsController : Controller
     {
         private readonly IClientsService _clientsService;
@@ -25,7 +25,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
-        [CustomAuthorize(permission:"showClient", module: "Client")]
+        [CustomAuthorize(permission: "showClient", module: "Client")]
+        [Authorize]
         public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
             Response<PaginationResponse<ClientDTO>> response = await _clientsService.GetPaginationAsync(request);
@@ -34,6 +35,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpGet]
         [CustomAuthorize(permission: "createClient", module: "Client")]
+        [Authorize]
         public IActionResult Create()
         {
             ClientDTO model = new ClientDTO
@@ -45,6 +47,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
+        [CustomAuthorize(permission: "createClient", module: "Client")]
+        [Authorize]
         public async Task<IActionResult> Create(ClientDTO dto)
         {
             if (!ModelState.IsValid)
@@ -67,6 +71,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpGet]
         [CustomAuthorize(permission: "updateClient", module: "Client")]
+        [Authorize]
         public async Task<IActionResult> Edit([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -86,6 +91,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
+        [CustomAuthorize(permission: "updateClient", module: "Client")]
+        [Authorize]
         public async Task<IActionResult> Edit(ClientDTO dto)
         {
             if (!ModelState.IsValid)
@@ -108,6 +115,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpPost]
         [CustomAuthorize(permission: "deleteClient", module: "Client")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             Response<object> response = await _clientsService.DeleteAsync(id);
@@ -124,21 +132,5 @@ namespace OmniPyme.Web.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-        //[HttpPost]
-        //public async Task<IActionResult> toggle([FromForm] ToggleClientStatusDTO dto)
-        //{
-        //    Response<object> response = await _clientsService.ToggleAsync(dto);
-        //    if (response.IsSuccess)
-        //    {
-        //        _notyfService.Success(response.Message);
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    else
-        //    {
-        //        _notyfService.Error(response.Message);
-        //    }
-        //    return RedirectToAction(nameof(Index));
-        //}
     }
 }

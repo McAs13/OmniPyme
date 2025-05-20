@@ -85,7 +85,7 @@ namespace OmniPyme.Web.Data.Seeders
                 {
                     new Permission { Name = "ShowSale", Description = "Ver ventas", Module = "Sale" },
                     new Permission { Name = "CreateSale", Description = "Crear ventas", Module = "Sale" },
-                    new Permission { Name = "UpdateSale", Description = "Editar ventas", Module = "Sale" },
+                    new Permission { Name = "ViewSale", Description = "Ver ventas", Module = "Sale" },
                     new Permission { Name = "DeleteSale", Description = "Eliminar ventas", Module = "Sale" },
 
 
@@ -125,7 +125,5 @@ namespace OmniPyme.Web.Data.Seeders
                     new Permission { Name = "ShowLogs", Description = "Ver Logs", Module = "Logs" },
                 };
         }
-
-
     }
 }

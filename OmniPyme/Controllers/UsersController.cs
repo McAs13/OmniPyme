@@ -1,5 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using OmniPyme.Web.Core;
@@ -30,6 +31,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpGet]
         [CustomAuthorize(permission: "showUsers", module: "Usuarios")]
+        [Authorize]
         public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
             Response<PaginationResponse<UsersDTO>> response = await _usersService.GetPaginationAsync(request);
@@ -38,6 +40,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpGet]
         [CustomAuthorize(permission: "createUsers", module: "Usuarios")]
+        [Authorize]
         public async Task<IActionResult> Create()
         {
             IEnumerable<SelectListItem> items = await _combosHelper.GetComboRoles();
@@ -52,6 +55,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpPost]
         [CustomAuthorize(permission: "createUsers", module: "Usuarios")]
+        [Authorize]
         public async Task<IActionResult> Create(UsersDTO dto)
         {
             if (!ModelState.IsValid)
@@ -78,6 +82,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpGet]
         [CustomAuthorize(permission: "updateUsers", module: "Usuarios")]
+        [Authorize]
         public async Task<IActionResult> Edit(Guid id)
         {
             if (Guid.Empty.Equals(id))
@@ -99,6 +104,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpPost]
         [CustomAuthorize(permission: "updateUsers", module: "Usuarios")]
+        [Authorize]
         public async Task<IActionResult> Edit(UsersDTO dto)
         {
             if (!ModelState.IsValid)
@@ -119,9 +125,8 @@ namespace OmniPyme.Web.Controllers
 
             _notifyService.Success(response.Message);
             return RedirectToAction(nameof(Index));
-            /**/
         }
 
-
+        //TODO: Falta el metodo para eliminar usuarios
     }
 }

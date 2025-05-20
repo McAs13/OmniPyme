@@ -1,8 +1,10 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using OmniPyme.Web.Core;
+using OmniPyme.Web.Core.Attributes;
 using OmniPyme.Web.Core.Pagination;
 using OmniPyme.Web.DTOs;
 using OmniPyme.Web.Helpers;
@@ -33,6 +35,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
+        [CustomAuthorize(permission: "ShowSale", module: "Sale")]
+        [Authorize]
         public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
             Response<PaginationResponse<InvoiceDTO>> response = await _invoicesService.GetPaginationAsync(request);
@@ -40,6 +44,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
+        [CustomAuthorize(permission: "CreateSale", module: "Sale")]
+        [Authorize]
         public async Task<IActionResult> Create()
         {
             // Obtener el último registro ordenado por InvoiceNumber
@@ -59,6 +65,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
+        [CustomAuthorize(permission: "CreateSale", module: "Sale")]
+        [Authorize]
         public async Task<IActionResult> Create(InvoiceViewModel viewModel)
         {
 
@@ -144,72 +152,9 @@ namespace OmniPyme.Web.Controllers
             return RedirectToAction("Index");
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Edit([FromRoute] int id)
-        //{
-        //    Response<InvoiceDTO> response = await _invoicesService.GetOneAsync(id);
-
-        //    if (!response.IsSuccess)
-        //    {
-        //        _notyfService.Error(response.Message);
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    InvoiceDTO dto = response.Result;
-
-        //    int selectedClientId = dto.Sale?.IdClient ?? 0;
-
-        //    InvoiceCreateViewModel viewModel = new InvoiceCreateViewModel
-        //    {
-        //        IdInvoice = dto.Id,
-        //        InvoiceNumber = dto.InvoiceNumber,
-        //        InvoiceDate = dto.InvoiceDate,
-        //        IdSale = dto.Sale?.Id ?? 0,
-        //        SaleDate = dto.Sale?.SaleDate ?? dto.InvoiceDate,
-        //        SaleTotal = (double)(dto.Sale?.SaleTotal ?? 0),
-        //        SalePaymentMethod = dto.Sale?.SalePaymentMethod, // Valor por defecto si no tiene
-        //        IdClient = selectedClientId,
-
-        //        Clients = await _combosHelper.GetComboCliente(selectedClientId)
-        //    };
-
-        //    return View(viewModel);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Edit(InvoiceCreateViewModel viewModel)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        _notyfService.Error("Debe ajustar los errores de validacion");
-        //        viewModel.Clients = await _combosHelper.GetComboCliente();
-        //        return View(viewModel);
-        //    }
-
-        //    //Mapea de InvoiceCreateViewModel a InvoiceDTO
-        //    InvoiceDTO dto = new InvoiceDTO
-        //    {
-        //        Id = viewModel.IdInvoice ?? 0,
-        //        InvoiceNumber = viewModel.InvoiceNumber,
-        //        InvoiceDate = viewModel.InvoiceDate,
-        //        IdClient = viewModel.IdClient,
-        //        IdSale = viewModel.IdSale ?? 0,
-        //    };
-
-        //    Response<InvoiceDTO> response = await _invoicesService.EditAsync(dto);
-
-        //    if (!response.IsSuccess)
-        //    {
-        //        _notyfService.Error(response.Message);
-        //        dto.Clients = await _combosHelper.GetComboCliente();
-        //        return View(viewModel);
-        //    }
-
-        //    _notyfService.Success(response.Message);
-        //    return RedirectToAction("Index");
-        //}
-
         [HttpPost]
+        [CustomAuthorize(permission: "DeleteSale", module: "Sale")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             //Response<object> response = await _invoicesService.DeleteAsync(id);
@@ -268,58 +213,9 @@ namespace OmniPyme.Web.Controllers
             return RedirectToAction("Index");
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> View([FromRoute] int id)
-        //{
-        //    Response<InvoiceDTO> invoiceResponse = await _invoicesService.GetOneAsync(id);
-
-        //    if (!invoiceResponse.IsSuccess)
-        //    {
-        //        _notyfService.Error("Error al obtener la factura: " + invoiceResponse.Message);
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    Response<List<SaleDetailDTO>> detailResponse = await _saleDetailService.GetBySaleIdAsync(invoiceResponse.Result.IdSale);
-        //    if (!detailResponse.IsSuccess)
-        //    {
-        //        _notyfService.Error("Error al obtener los detalles de la venta: " + detailResponse.Message);
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    int idClient = invoiceResponse.Result.Sale.IdClient;
-        //    IEnumerable<SelectListItem> clientes = await _combosHelper.GetComboCliente();
-        //    SelectListItem clienteItem = clientes.FirstOrDefault(c => c.Value == idClient.ToString());
-        //    string clientName = clienteItem?.Text ?? "Cliente no encontrado";
-
-        //    InvoiceViewModel viewModel = new InvoiceViewModel
-        //    {
-        //        IdInvoice = invoiceResponse.Result.Id,
-        //        InvoiceNumber = invoiceResponse.Result.InvoiceNumber,
-        //        InvoiceDate = invoiceResponse.Result.InvoiceDate,
-        //        IdSale = invoiceResponse.Result.IdSale,
-        //        SaleCode = invoiceResponse.Result.Sale.SaleCode,
-        //        SaleDate = invoiceResponse.Result.Sale.SaleDate,
-        //        SaleTotal = (double)invoiceResponse.Result.Sale.SaleTotal,
-        //        SalePaymentMethod = invoiceResponse.Result.Sale.SalePaymentMethod,
-        //        IdClient = invoiceResponse.Result.Sale.IdClient,
-        //        ClientName = clientName,
-        //        SaleDetails = detailResponse.Result.Select(d => new SaleDetailViewModel
-        //        {
-        //            IdSaleDetail = d.Id,
-        //            IdSale = d.IdSale,
-        //            SaleDetailCode = d.SaleDetailCode,
-        //            IdProduct = d.SaleDetailProductCode,
-        //            SaleDetailProductCode = d.SaleDetailProductCode,
-        //            SaleDetailProductQuantity = d.SaleDetailProductQuantity,
-        //            SaleDetailProductPrice = (double)d.SaleDetailProductPrice,
-        //            SaleDetailProductTax = (double)d.SaleDetailProductTax,
-        //            SaleDetailSubtotal = (double)d.SaleDetailSubtotal
-        //        }).ToList()
-        //    };
-        //    return View(viewModel);
-        //}
-
         [HttpGet]
+        [CustomAuthorize(permission: "ViewSale", module: "Sale")]
+        [Authorize]
         public async Task<IActionResult> View([FromRoute] int id)
         {
             Response<InvoiceDTO> invoiceResponse = await _invoicesService.GetOneAsync(id);

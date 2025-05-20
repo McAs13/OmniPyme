@@ -61,15 +61,16 @@ namespace OmniPyme.Web
         {
             //Services
             builder.Services.AddScoped<IClientsService, ClientsService>();
-            builder.Services.AddScoped<IUsersService, UsersService>();
+            builder.Services.AddScoped<IHomeService, HomeService>();
             builder.Services.AddScoped<IInvoicesService, InvoicesService>();
-            builder.Services.AddScoped<ISalesService, SalesService>();
-            builder.Services.AddScoped<ISaleDetailService, SaleDetailService>();
             builder.Services.AddScoped<IProductCategoriesService, ProductCategoriesService>();
             builder.Services.AddScoped<IProductsService, ProductsService>();
-            builder.Services.AddScoped<IRolesService, RolesService>();
-            builder.Services.AddTransient<SeedDb>();
             builder.Services.AddTransient<IReadLogsService, ReadPlainTextLogsService>();
+            builder.Services.AddScoped<IRolesService, RolesService>();
+            builder.Services.AddScoped<ISalesService, SalesService>();
+            builder.Services.AddScoped<ISaleDetailService, SaleDetailService>();
+            builder.Services.AddTransient<SeedDb>();
+            builder.Services.AddScoped<IUsersService, UsersService>();
 
             //Storage
             builder.Services.AddKeyedScoped<IStorageService, LocalStorageService>("local");

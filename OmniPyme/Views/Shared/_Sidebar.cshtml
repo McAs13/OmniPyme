@@ -37,7 +37,7 @@
 			</li>
 		}
 
-		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowSale", "factura"))
+		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowSale", "Sale"))
 		{
 
 
@@ -50,7 +50,7 @@
 
 		}
 
-		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowShowProductCategory", "ProductCategory"))
+		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowProductCategory", "ProductCategory"))
 		{
 			<li class="nav-item">
 				<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString()  == "ProductCategories" ? "" : "collapsed") active" asp-controller="ProductCategories" asp-action="Index">

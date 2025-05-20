@@ -1,4 +1,5 @@
 ﻿@model PaginationResponse<InvoiceDTO>
+@inject OmniPyme.Web.Services.IUsersService _usersService
 @{
 	ViewData["Title"] = "Facturas";
 }
@@ -19,9 +20,12 @@
 		<div class="card-header">
 			<div class="row">
 				<h3 class="card-title col-md-11">Facturas</h3>
-				<div class="col-md-1">
-					<a asp-action="Create" class="btn btn-primary"><i class="bi bi-file-earmark-spreadsheet"></i>+</a>
-				</div>
+				@if (await _usersService.CurrentUserIsAuthorizedAsync("CreateSale", "Sale"))
+				{
+					<div class="col-md-1">
+						<a asp-action="Create" class="btn btn-primary"><i class="bi bi-file-earmark-spreadsheet"></i>+</a>
+					</div>
+				}
 
 			</div>
 		</div>
@@ -49,12 +53,18 @@
 								<td>@item.Sale.SaleTotal</td>
 
 								<td>
-									<a asp-action="View" asp-route-id="@item.Id" class="btn btn-sm btn-info">
-										<i class="bi bi-eye"></i>
-									</a>
-									<form asp-action="Delete" asp-route-id="@item.Id" style="display: contents;" method="post">
-										<button class="btn btn-danger btn-sm btnDelete"><i class="bi bi-trash-fill"></i></button>
-									</form>
+									@if (await _usersService.CurrentUserIsAuthorizedAsync("ViewSale", "Sale"))
+									{
+										<a asp-action="View" asp-route-id="@item.Id" class="btn btn-sm btn-info">
+											<i class="bi bi-eye"></i>
+										</a>
+									}
+									@if (await _usersService.CurrentUserIsAuthorizedAsync("DeleteSale", "Sale"))
+									{
+										<form asp-action="Delete" asp-route-id="@item.Id" style="display: contents;" method="post">
+											<button class="btn btn-danger btn-sm btnDelete"><i class="bi bi-trash-fill"></i></button>
+										</form>
+									}
 								</td>
 							</tr>
 						}

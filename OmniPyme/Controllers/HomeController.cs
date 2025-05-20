@@ -1,6 +1,9 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OmniPyme.Models;
+using OmniPyme.Web.Core.Pagination;
+using OmniPyme.Web.Services;
 using Serilog;
 
 namespace OmniPyme.Controllers;
@@ -8,12 +11,15 @@ namespace OmniPyme.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly IHomeService _homeService;
 
     public HomeController(ILogger<HomeController> logger)
     {
         _logger = logger;
     }
 
+    [HttpGet]
+    [Authorize]
     public IActionResult Index()
     {
         //Log.Warning("Log de advertencia");
@@ -33,6 +39,7 @@ public class HomeController : Controller
         //{
         //    Log.Error(ex, "Ha ocurrido un error en HomeController.Index");
         //}
+
         return View();
     }
 

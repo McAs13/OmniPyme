@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using OmniPyme.Web.Core.Attributes;
 using OmniPyme.Web.DTOs;
 using OmniPyme.Web.Services;
 
@@ -13,6 +15,9 @@ namespace OmniPyme.Web.Controllers
             _readLogsService = readLogsService;
         }
 
+        [HttpGet]
+        [CustomAuthorize(permission: "ShowLogs", module: "Logs")]
+        [Authorize]
         public IActionResult Index(DateTime? date)
         {
             LogViewerDTO dto = new LogViewerDTO

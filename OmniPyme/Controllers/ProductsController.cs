@@ -5,6 +5,8 @@ using OmniPyme.Web.Services;
 using OmniPyme.Web.Core.Pagination;
 using OmniPyme.Web.Core;
 using OmniPyme.Web.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using OmniPyme.Web.Core.Attributes;
 
 namespace OmniPyme.Web.Controllers
 {
@@ -13,18 +15,23 @@ namespace OmniPyme.Web.Controllers
         private readonly IProductsService _productsService;
         private readonly ICombosHelper _combosHelper;
         private readonly INotyfService _notyf;
+        private readonly IUsersService _usersService;
 
         public ProductsController(
             IProductsService productsService,
             ICombosHelper combosHelper,
-            INotyfService notyf)
+            INotyfService notyf,
+            IUsersService usersService)
         {
             _productsService = productsService;
             _combosHelper = combosHelper;
             _notyf = notyf;
+            _usersService = usersService;
         }
 
         [HttpGet]
+        [CustomAuthorize(permission: "ShowProduct", module: "Product")]
+        [Authorize]
         public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
             Response<PaginationResponse<ProductDTO>> response = await _productsService.GetPaginationAsync(request);
@@ -32,6 +39,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
+        [CustomAuthorize(permission: "CreateProduct", module: "Product")]
+        [Authorize]
         public async Task<IActionResult> Create()
         {
             ProductDTO dto = new ProductDTO
@@ -42,6 +51,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
+        [CustomAuthorize(permission: "CreateProduct", module: "Product")]
+        [Authorize]
         public async Task<IActionResult> Create(ProductDTO dto)
         {
             if (!ModelState.IsValid)
@@ -69,6 +80,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpGet]
+        [CustomAuthorize(permission: "UpdateProduct", module: "Product")]
+        [Authorize]
         public async Task<IActionResult> Edit([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -102,6 +115,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
+        [CustomAuthorize(permission: "UpdateProduct", module: "Product")]
+        [Authorize]
         public async Task<IActionResult> Edit(ProductDTO dto)
         {
             if (!ModelState.IsValid)
@@ -110,7 +125,6 @@ namespace OmniPyme.Web.Controllers
                 dto.ProductCategories = await _combosHelper.GetComboProductCategories();
                 return View(dto);
             }
-
             // Convertir el porcentaje a valor decimal
             if (dto.ProductTax.HasValue)
             {
@@ -130,6 +144,8 @@ namespace OmniPyme.Web.Controllers
         }
 
         [HttpPost]
+        [CustomAuthorize(permission: "DeleteProduct", module: "Product")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             Response<object> response = await _productsService.DeleteAsync(id);

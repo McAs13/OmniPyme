@@ -22,26 +22,26 @@ namespace OmniPyme.Web.Data.Seeders
         public async Task SeedAsync()
         {
             await CheckRoles();
-            await BasicRoleAsync();
+            //await BasicRoleAsync();
             await CheckUsers();
 
         }
 
-        private async Task BasicRoleAsync()
-        {
-            bool exists = await _context.PrivateURoles.AnyAsync(r => r.Name == "Basic");
+        //private async Task BasicRoleAsync()
+        //{
+        //    bool exists = await _context.PrivateURoles.AnyAsync(r => r.Name == "Basic");
 
-            if (!exists)
-            {
-                PrivateURole role = new PrivateURole { Name = "Basic" };
-                await _context.PrivateURoles.AddAsync(role);
-                await _context.SaveChangesAsync();
-            }
-        }
+        //    if (!exists)
+        //    {
+        //        PrivateURole role = new PrivateURole { Name = "Basic" };
+        //        await _context.PrivateURoles.AddAsync(role);
+        //        await _context.SaveChangesAsync();
+        //    }
+        //}
 
         private async Task CheckUsers()
         {
-            Users? users = await _usersService.GetUserAsync("manuel@yopmail.com");
+            Users? users = await _usersService.GetUserAsync("Admin@yopmail.com");
 
             if (users is null)
             {
@@ -49,86 +49,151 @@ namespace OmniPyme.Web.Data.Seeders
 
                 users = new Users
                 {
-                    Email = "manuel@yopmail.com",
-                    FirstName = "Manuel",
-                    LastName = "Moreno",
+                    Email = "Admin@yopmail.com",
+                    FirstName = "Super",
+                    LastName = "Admin",
                     PhoneNumber = "300000000",
-                    UserName = "manuel@yopmail.com",
+                    UserName = "Admin@yopmail.com",
                     Document = "11111122",
                     PrivateURole = adminRole
                 };
 
-                await _usersService.AddUserAsync(users, "1234");
+                await _usersService.AddUserAsync(users, "12345");
 
                 string token = await _usersService.GenerateEmailConfirmationTokenAsync(users);
                 await _usersService.ConfirmEmailAsync(users, token);
 
             }
-            // Content Manager
-            users = await _usersService.GetUserAsync("Luisa@yopmail.com");
+            // Gerente
+            users = await _usersService.GetUserAsync("gerente@yopmail.com");
 
             if (users is null)
             {
-                PrivateURole contentManagerRole = await _context.PrivateURoles.FirstOrDefaultAsync(r => r.Name == "Gestor de contenido");
+                PrivateURole gerenteRole = await _context.PrivateURoles.FirstOrDefaultAsync(r => r.Name == "Gerente");
 
                 users = new Users
                 {
-                    Email = "Luisa@yopmail.com",
-                    FirstName = "Luisa",
-                    LastName = "Perez",
+                    Email = "gerente@yopmail.com",
+                    FirstName = "Gerente",
+                    LastName = "Gerente",
                     PhoneNumber = "3454657",
-                    UserName = "Luisa@yopmail.com",
-                    Document = "1324454",
-                    PrivateURole = contentManagerRole
-                };
-
-                await _usersService.AddUserAsync(users, "1234");
-
-                string token = await _usersService.GenerateEmailConfirmationTokenAsync(users);
-                await _usersService.ConfirmEmailAsync(users, token);
-
-            }
-            // basic
-            users = await _usersService.GetUserAsync("prueba@yopmail.com");
-
-            if (users is null)
-            {
-                PrivateURole basicRole = await _context.PrivateURoles.FirstOrDefaultAsync(r => r.Name == "Basic");
-
-                users = new Users
-                {
-                    Email = "prueba@yopmail.com",
-                    FirstName = "prueba",
-                    LastName = "prueba",
-                    PhoneNumber = "3454657",
-                    UserName = "prueba@yopmail.com",
+                    UserName = "gerente@yopmail.com",
                     Document = "176767565657",
-                    PrivateURole = basicRole
+                    PrivateURole = gerenteRole
                 };
-
                 await _usersService.AddUserAsync(users, "1234");
-
                 string token = await _usersService.GenerateEmailConfirmationTokenAsync(users);
                 await _usersService.ConfirmEmailAsync(users, token);
+            }
+            // Vendedor
+            users = await _usersService.GetUserAsync("vendedor@yopmail.com");
 
+            if (users is null)
+            {
+                PrivateURole vendedorRole = await _context.PrivateURoles.FirstOrDefaultAsync(r => r.Name == "Vendedor");
+
+                users = new Users
+                {
+                    Email = "vendedor@yopmail.com",
+                    FirstName = "Vendedor",
+                    LastName = "Vendedor",
+                    PhoneNumber = "345465347",
+                    UserName = "vendedor@yopmail.com",
+                    Document = "176723467565657",
+                    PrivateURole = vendedorRole
+                };
+                await _usersService.AddUserAsync(users, "1234");
+                string token = await _usersService.GenerateEmailConfirmationTokenAsync(users);
+                await _usersService.ConfirmEmailAsync(users, token);
+            }
+            // Inventario
+            users = await _usersService.GetUserAsync("inventario@yopmail.com");
+
+            if (users is null)
+            {
+                PrivateURole inventarioRole = await _context.PrivateURoles.FirstOrDefaultAsync(r => r.Name == "Gestor de Inventario");
+
+                users = new Users
+                {
+                    Email = "inventario@yopmail.com",
+                    FirstName = "Gestor",
+                    LastName = "Inventario",
+                    PhoneNumber = "345462345347",
+                    UserName = "inventario@yopmail.com",
+                    Document = "176723467345565657",
+                    PrivateURole = inventarioRole
+                };
+                await _usersService.AddUserAsync(users, "1234");
+                string token = await _usersService.GenerateEmailConfirmationTokenAsync(users);
+                await _usersService.ConfirmEmailAsync(users, token);
             }
         }
         private async Task CheckRoles()
         {
             await AdminRolesAsync();
-            await ContentManagerRoleAsync();
+            await ManagerRoleAsync();
+            await VendorRoleAsync();
+            await InventoryManagerRoleAsync();
         }
 
-        private async Task ContentManagerRoleAsync()
+        private async Task ManagerRoleAsync()
         {
-            bool exists = await _context.PrivateURoles.AnyAsync(r => r.Name == "Gestor de contenido");
+            bool exists = await _context.PrivateURoles.AnyAsync(r => r.Name == "Gerente");
 
             if (!exists)
             {
-                PrivateURole role = new PrivateURole { Name = "Gestor de contenido" };
+                PrivateURole role = new PrivateURole { Name = "Gerente" };
                 await _context.PrivateURoles.AddAsync(role);
 
-                List<Permission> permissions = await _context.Permissions.Where(p => p.Module == "Clientes" || p.Module == "Product")
+                List<Permission> permissions = await _context.Permissions.Where(p => p.Module == "Client" || p.Module == "Product" || p.Module == "ProductCategory" || p.Module == "Sale" || p.Module == "Users")
+                                                                         .ToListAsync();
+
+
+                foreach (Permission permission in permissions)
+                {
+
+                    await _context.RolePermissions.AddAsync(new RolePermission { Permission = permission, Role = role });
+
+                }
+
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task VendorRoleAsync()
+        {
+            bool exists = await _context.PrivateURoles.AnyAsync(r => r.Name == "Vendedor");
+
+            if (!exists)
+            {
+                PrivateURole role = new PrivateURole { Name = "Vendedor" };
+                await _context.PrivateURoles.AddAsync(role);
+
+                List<Permission> permissions = await _context.Permissions.Where(p => (p.Module == "Client" || p.Module == "Sale") && !p.Name.StartsWith("Delete"))
+                                                                         .ToListAsync();
+
+
+                foreach (Permission permission in permissions)
+                {
+
+                    await _context.RolePermissions.AddAsync(new RolePermission { Permission = permission, Role = role });
+
+                }
+
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task InventoryManagerRoleAsync()
+        {
+            bool exists = await _context.PrivateURoles.AnyAsync(r => r.Name == "Gestor de Inventario");
+
+            if (!exists)
+            {
+                PrivateURole role = new PrivateURole { Name = "Gestor de Inventario" };
+                await _context.PrivateURoles.AddAsync(role);
+
+                List<Permission> permissions = await _context.Permissions.Where(p => (p.Module == "Product" || p.Module == "ProductCategory") && !p.Name.StartsWith("Delete"))
                                                                          .ToListAsync();
 
 

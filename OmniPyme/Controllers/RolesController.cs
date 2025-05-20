@@ -1,4 +1,5 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OmniPyme.Web.Core;
 using OmniPyme.Web.Core.Attributes;
@@ -23,9 +24,10 @@ namespace OmniPyme.Web.Controllers
 
         [HttpGet]
         [CustomAuthorize(permission: "showRoles", module: "Roles")]
+        [Authorize]
         public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
-            
+
             Response<PaginationResponse<PrivateURoleDTO>> response = await _rolesService.GetPaginationAsync(request);
             if (!response.IsSuccess)
             {
@@ -37,6 +39,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpGet]
         [CustomAuthorize(permission: "createRoles", module: "Roles")]
+        [Authorize]
         public async Task<IActionResult> Create()
         {
             Response<List<PermissionDTO>> permissionsResponse = await _rolesService.GetPermissionsAsync();
@@ -47,7 +50,7 @@ namespace OmniPyme.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-   
+
 
             PrivateURoleDTO dto = new PrivateURoleDTO
             {
@@ -60,7 +63,7 @@ namespace OmniPyme.Web.Controllers
                     Selected = false
                 }).ToList(),
 
-               
+
             };
 
             return View(dto);
@@ -70,6 +73,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpPost]
         [CustomAuthorize(permission: "createRoles", module: "Roles")]
+        [Authorize]
         public async Task<IActionResult> Create(PrivateURoleDTO dto)
         {
             if (!ModelState.IsValid)
@@ -87,7 +91,7 @@ namespace OmniPyme.Web.Controllers
                     Selected = false,
                 }).ToList();
 
-              
+
 
                 return View(dto);
             }
@@ -112,7 +116,7 @@ namespace OmniPyme.Web.Controllers
                 Module = p.Module,
             }).ToList();
 
-          
+
 
             return View(dto);
         }
@@ -120,6 +124,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpPost]
         [CustomAuthorize(permission: "updateRoles", module: "Roles")]
+        [Authorize]
         public async Task<IActionResult> Edit(PrivateURoleDTO dto)
         {
             if (!ModelState.IsValid)
@@ -150,6 +155,7 @@ namespace OmniPyme.Web.Controllers
 
         [HttpGet]
         [CustomAuthorize(permission: "updateRoles", module: "Roles")]
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             Response<PrivateURoleDTO> response = await _rolesService.GetOneAsync(id);
@@ -162,5 +168,8 @@ namespace OmniPyme.Web.Controllers
 
             return View(response.Result);
         }
+
+
+        //TODO: Falta el metodo para eliminar roles
     }
 }
