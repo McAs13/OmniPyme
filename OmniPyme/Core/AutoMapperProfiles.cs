@@ -17,9 +17,12 @@ namespace OmniPyme.Web.Core
             CreateMap<PrivateURole, PrivateURoleDTO>().ReverseMap();
             CreateMap<Permission, PermissionDTO>().ReverseMap();
             CreateMap<Users, UsersDTO>();
-            CreateMap<UsersDTO, Users>().ForMember(users=> users.UserName, Config=>Config
-                                        .MapFrom(dto=>dto.Email));
+            CreateMap<UsersDTO, Users>().ForMember(users => users.UserName, config => config.MapFrom(dto => dto.Email));
+            CreateMap<Users, AccountUserDTO>().ForMember(dest => dest.Photo, options => options.Ignore())
+                                             .ForMember(dest => dest.PhotoUrl, config => config.MapFrom(src => src.Photo));
 
+            CreateMap<AccountUserDTO, Users>().ForMember(dest => dest.Photo, options => options.Ignore())
+                                             .ForMember(user => user.UserName, config => config.MapFrom(dto => dto.Email));
         }
     }
 }

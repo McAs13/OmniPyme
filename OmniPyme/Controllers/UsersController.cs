@@ -11,7 +11,7 @@ using OmniPyme.Web.Helpers;
 using OmniPyme.Web.Services;
 
 
-namespace PrivateBlog.Web.Controllers
+namespace OmniPyme.Web.Controllers
 {
     public class UsersController : Controller
     {

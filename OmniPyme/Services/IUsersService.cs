@@ -10,6 +10,7 @@ using OmniPyme.Web.Helpers;
 using OmniPyme.Web.Services;
 
 using ClaimsUser = System.Security.Claims.ClaimsPrincipal;
+using Serilog;
 
 namespace OmniPyme.Web.Services
 {
@@ -23,10 +24,15 @@ namespace OmniPyme.Web.Services
         public Task<Users> GetUserAsync(string email);
         public Task<SignInResult> LoginAsync(LoginDTO dto);
         public Task LogoutAsync();
-        Task<Response<PaginationResponse<UsersDTO>>> GetPaginationAsync(PaginationRequest request);
-        Task<Response<UsersDTO>> CreateAsync(UsersDTO dto);
-        Task<Users?> GetUserAsync(Guid id);
-        Task<Response<UsersDTO>> UpdateUserAsync(UsersDTO dto);
+        public Task<Response<PaginationResponse<UsersDTO>>> GetPaginationAsync(PaginationRequest request);
+        public Task<Response<UsersDTO>> CreateAsync(UsersDTO dto);
+        public Task<Users?> GetUserAsync(Guid id);
+        public Task<Response<UsersDTO>> UpdateUserAsync(UsersDTO dto);
+        public Task<int> UpdateUserAsync(AccountUserDTO dto);
+        public Task<bool> CheckPasswordAsync(Users user, string currentPassword);
+        public Task<string> GeneratePasswordResetTokenAsync(Users user);
+        public Task<IdentityResult> ResetPasswordAsync(Users user, string resetToken, string newPassword);
+
     }
 
     public class UsersService : CustomQueryableOperations, IUsersService
@@ -36,12 +42,17 @@ namespace OmniPyme.Web.Services
         private readonly SignInManager<Users> _signInManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
+        private readonly IStorageService _localStorageService;
+        private readonly IStorageService _azureStorageService;
+        private readonly string _container = "users";
 
         public UsersService(DataContext context,
                             UserManager<Users> userManager,
                             SignInManager<Users> signInManager,
                             IHttpContextAccessor httpContextAccessor,
-                            IMapper mapper)
+                            IMapper mapper,
+                            [FromKeyedServices("local")] IStorageService localStorageService,
+                            [FromKeyedServices("azure")] IStorageService azureStorageService)
             : base(context, mapper)
         {
             _context = context;
@@ -49,11 +60,18 @@ namespace OmniPyme.Web.Services
             _signInManager = signInManager;
             _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
+            _localStorageService = localStorageService;
+            _azureStorageService = azureStorageService;
         }
 
         public async Task<IdentityResult> AddUserAsync(Users users, string password)
         {
-            return await _userManager.CreateAsync( users, password);
+            return await _userManager.CreateAsync(users, password);
+        }
+
+        public async Task<bool> CheckPasswordAsync(Users user, string currentPassword)
+        {
+            return await _userManager.CheckPasswordAsync(user, currentPassword);
         }
 
         public async Task<IdentityResult> ConfirmEmailAsync(Users users, string token)
@@ -120,6 +138,11 @@ namespace OmniPyme.Web.Services
             return await _userManager.GenerateEmailConfirmationTokenAsync(users);
         }
 
+        public async Task<string> GeneratePasswordResetTokenAsync(Users user)
+        {
+            return await _userManager.GeneratePasswordResetTokenAsync(user);
+        }
+
         public async Task<Response<PaginationResponse<UsersDTO>>> GetPaginationAsync(PaginationRequest request)
         {
 
@@ -133,6 +156,8 @@ namespace OmniPyme.Web.Services
                                       || b.Email.ToLower().Contains(request.Filter.ToLower())
                                       || b.PhoneNumber.Contains(request.Filter));
             }
+
+            query = query.OrderBy(b => b.Id);
 
             return await GetPaginationAsync<Users, UsersDTO>(request, query);
         }
@@ -161,6 +186,11 @@ namespace OmniPyme.Web.Services
             await _signInManager.SignOutAsync();
         }
 
+        public async Task<IdentityResult> ResetPasswordAsync(Users user, string resetToken, string newPassword)
+        {
+            return await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+        }
+
         public async Task<Response<UsersDTO>> UpdateUserAsync(UsersDTO dto)
         {
             try
@@ -184,6 +214,37 @@ namespace OmniPyme.Web.Services
             catch (Exception ex)
             {
                 return ResponseHelper<UsersDTO>.MakeResponseFail(ex);
+            }
+        }
+
+        public async Task<int> UpdateUserAsync(AccountUserDTO dto)
+        {
+            try
+            {
+                Users users = await GetUserAsync(dto.Id);
+                users.PhoneNumber = dto.PhoneNumber;
+                users.Document = dto.Document;
+                users.FirstName = dto.FirstName;
+                users.LastName = dto.LastName;
+
+                if (dto.Photo is not null)
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        await dto.Photo.CopyToAsync(ms);
+                        byte[] content = ms.ToArray();
+                        string extension = Path.GetExtension(dto.Photo.FileName);
+                        users.Photo = await _localStorageService.SaveFileAsync(content, extension, _container, dto.Photo.ContentType);
+                    }
+                }
+
+                _context.Users.Update(users);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                return 0;
             }
         }
     }

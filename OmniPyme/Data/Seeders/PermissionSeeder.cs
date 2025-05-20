@@ -4,7 +4,7 @@ using OmniPyme.Web.Data.Entities;
 
 namespace OmniPyme.Web.Data.Seeders
 {
-   
+
     public class PermissionSeeder
     {
         private readonly DataContext _context;
@@ -17,7 +17,7 @@ namespace OmniPyme.Web.Data.Seeders
         public async Task SeedAsync()
         {
 
-            List<Permission> permissions = [.. Client(), .. ProductCategories(), .. Products(), .. Sales(), .. Roles(), .. Users()];
+            List<Permission> permissions = [.. Client(), .. ProductCategories(), .. Products(), .. Sales(), .. Roles(), .. Users(), .. Logs()];
 
             foreach (Permission permission in permissions)
             {
@@ -28,7 +28,7 @@ namespace OmniPyme.Web.Data.Seeders
 
                     await _context.Permissions.AddAsync(permission);
                 }
-               
+
             }
 
             await _context.SaveChangesAsync();
@@ -37,7 +37,7 @@ namespace OmniPyme.Web.Data.Seeders
         private List<Permission> Client()
         {
 
-           return new List<Permission>
+            return new List<Permission>
                 {
                     new Permission { Name = "ShowClient", Description = "Ver clientes", Module = "Client" },
                     new Permission { Name = "CreateClient", Description = "Crear clientes", Module = "Client" },
@@ -114,9 +114,15 @@ namespace OmniPyme.Web.Data.Seeders
                     new Permission { Name = "ShowUsers", Description = "Ver Users", Module = "Users" },
                     new Permission { Name = "CreateUsers", Description = "Crear Users", Module = "Users" },
                     new Permission { Name = "UpdateUsers", Description = "Editar Users", Module = "Users" },
-                    new Permission { Name = "DeleteUsers", Description = "Eliminar Users", Module = "Users" },
+                    new Permission { Name = "DeleteUsers", Description = "Eliminar Users", Module = "Users" }
+                };
+        }
 
-
+        private List<Permission> Logs()
+        {
+            return new List<Permission>
+                {
+                    new Permission { Name = "ShowLogs", Description = "Ver Logs", Module = "Logs" },
                 };
         }
 

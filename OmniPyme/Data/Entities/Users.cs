@@ -21,14 +21,12 @@ namespace OmniPyme.Web.Data.Entities
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         public string LastName { get; set; } = null!;
 
+        public string? Photo { get; set; }
+
         public int PrivateURoleId { get; set; }
 
-        public  PrivateURole PrivateURole { get; set; }
+        public PrivateURole PrivateURole { get; set; }
 
         public string FullName => $"{FirstName} {LastName}";
-
-
-   
-
     }
 }

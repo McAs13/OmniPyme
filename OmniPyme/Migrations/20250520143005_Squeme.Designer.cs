@@ -12,8 +12,8 @@ using OmniPyme.Data;
 namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250511001446_Squema")]
-    partial class Squema
+    [Migration("20250520143005_Squeme")]
+    partial class Squeme
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -486,6 +486,9 @@ namespace OmniPyme.Web.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Photo")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PrivateURoleId")
                         .HasColumnType("int");

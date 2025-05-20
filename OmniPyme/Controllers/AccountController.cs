@@ -1,20 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OmniPyme.Web.DTOs;
 using OmniPyme.Web.Services;
-using OmniPyme.Web.DTOs;
-using OmniPyme.Web.Services;
-using System.Threading.Tasks;
-using OmniPyme.Web.Services;
+using OmniPyme.Web.Data.Entities;
+using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
+using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Identity;
 
 namespace OmniPyme.Web.Controllers
 {
     public class AccountController : Controller
     {
         private readonly IUsersService _usersService;
+        private readonly IMapper _mapper;
+        private readonly INotyfService _notyfService;
 
-        public AccountController(IUsersService usersService)
+        public AccountController(IUsersService usersService, IMapper mapper, INotyfService notyfService)
         {
             _usersService = usersService;
+            _mapper = mapper;
+            _notyfService = notyfService;
         }
 
         [HttpGet]
@@ -69,10 +74,104 @@ namespace OmniPyme.Web.Controllers
 
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await _usersService.LogoutAsync();
             return RedirectToAction(nameof(Login));
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> UpdateUser()
+        {
+            Users user = await _usersService.GetUserAsync(User.Identity.Name);
+
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            return View(_mapper.Map<AccountUserDTO>(user));
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> UpdateUser(AccountUserDTO dto)
+        {
+            if (ModelState.IsValid)
+            {
+                int affectedRows = await _usersService.UpdateUserAsync(dto);
+
+                if (affectedRows > 0)
+                {
+                    _notyfService.Success("Datos de usuario actualizados con éxito");
+                }
+                else
+                {
+                    _notyfService.Error("Error al actualizar los datos de usuario");
+                }
+
+                return RedirectToAction("Index", "Home");
+
+            }
+
+            _notyfService.Error("Debe ajustar los errores de validación");
+            return View(dto);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDTO dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    _notyfService.Error("Debe ajustar los errores de validación");
+                    return View();
+                }
+
+                Users? user = await _usersService.GetUserAsync(User.Identity.Name);
+                if (user is null)
+                {
+                    _notyfService.Error("Ha ocurrido un error. Por favor intente mas tarde");
+                    return View();
+                }
+
+                bool isCorrectPassword = await _usersService.CheckPasswordAsync(user, dto.CurrentPassword);
+
+                if (!isCorrectPassword)
+                {
+                    _notyfService.Error("Credenciales incorrectas");
+                    return View();
+                }
+
+                string resetToken = await _usersService.GeneratePasswordResetTokenAsync(user);
+                IdentityResult result = await _usersService.ResetPasswordAsync(user, resetToken, dto.NewPassword);
+
+                if (!result.Succeeded)
+                {
+                    _notyfService.Error("Ha ocurrido un error al intantar actulizar la contraseña");
+                    ViewBag.Message = $"Error al actualizar la contraseña {result.Errors}";
+                    return View(dto);
+                }
+
+                _notyfService.Success("Contraseña actualizada con éxito");
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                _notyfService.Error("Ha ocurrido un error. Por favor intente mas tarde");
+                return View();
+            }
         }
     }
 }

@@ -36,7 +36,7 @@ namespace OmniPyme.Web.Services
         public async Task<Response<PrivateURoleDTO>> CreateAsync(PrivateURoleDTO dto)
         {
             using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
-            { 
+            {
                 try
                 {
                     PrivateURole role = _mapper.Map<PrivateURole>(dto);
@@ -67,7 +67,7 @@ namespace OmniPyme.Web.Services
                     await transaction.RollbackAsync();
                     return ResponseHelper<PrivateURoleDTO>.MakeResponseFail(ex);
                 }
-            } 
+            }
         }
 
         public async Task<Response<PrivateURoleDTO>> EditAsync(PrivateURoleDTO dto)
@@ -112,6 +112,8 @@ namespace OmniPyme.Web.Services
             {
                 query = query.Where(r => r.Name.ToLower().Contains(request.Filter.ToLower()));
             }
+
+            query = query.OrderBy(r => r.Id);
 
             return await GetPaginationAsync<PrivateURole, PrivateURoleDTO>(request, query);
         }
@@ -168,10 +170,6 @@ namespace OmniPyme.Web.Services
             {
                 return ResponseHelper<List<PermissionForRoleDTO>>.MakeResponseFail(ex);
             }
-
-            return await GetPaginationAsync<Role, RoleDTO>(request, query);
         }
-
-      
     }
 }

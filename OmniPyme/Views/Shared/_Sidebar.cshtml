@@ -15,15 +15,15 @@
 
 		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowClient", "Client"))
 		{
-			
-		
-		<li class="nav-item">
-			<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Clients" ? "" : "collapsed") active" asp-controller="Clients" asp-action="Index">
-				<i class="bi bi-person"></i>
-				<span>Clientes</span>
-			</a>
-		</li>
-		
+
+
+			<li class="nav-item">
+				<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Clients" ? "" : "collapsed") active" asp-controller="Clients" asp-action="Index">
+					<i class="bi bi-person"></i>
+					<span>Clientes</span>
+				</a>
+			</li>
+
 		}
 
 		@if (await _usersService.CurrentUserIsAuthorizedAsync("showRoles", "Roles"))
@@ -41,39 +41,34 @@
 		{
 
 
-		<li class="nav-item">
-			<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Invoices" ? "" : "collapsed") active" asp-controller="Invoices" asp-action="Index">
-				<i class="bi bi-file-earmark-spreadsheet"></i>
-				<span>Facturas</span>
-			</a>
-		</li>
+			<li class="nav-item">
+				<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Invoices" ? "" : "collapsed") active" asp-controller="Invoices" asp-action="Index">
+					<i class="bi bi-file-earmark-spreadsheet"></i>
+					<span>Facturas</span>
+				</a>
+			</li>
 
 		}
-	
+
 		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowShowProductCategory", "ProductCategory"))
 		{
-
-
-		<li class="nav-item">
-			<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString()  == "ProductCategories" ? "" : "collapsed") active" asp-controller="ProductCategories" asp-action="Index">
-				<i class="bi bi-tags"></i>
-				<span>Categoria de producto</span>
-			</a>
-		</li>
-
+			<li class="nav-item">
+				<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString()  == "ProductCategories" ? "" : "collapsed") active" asp-controller="ProductCategories" asp-action="Index">
+					<i class="bi bi-tags"></i>
+					<span>Categoria de producto</span>
+				</a>
+			</li>
 		}
 
 		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowProduct", "Product"))
 		{
 
-		<li class="nav-item">
-			<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Products" ? "" : "collapsed") active" asp-controller="Products" asp-action="Index">
-				<i class="bi bi-box"></i>
-				<span>Productos</span>
-			</a>
-		</li>
-
-
+			<li class="nav-item">
+				<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Products" ? "" : "collapsed") active" asp-controller="Products" asp-action="Index">
+					<i class="bi bi-box"></i>
+					<span>Productos</span>
+				</a>
+			</li>
 		}
 
 		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowUsers", "Users"))
@@ -85,10 +80,18 @@
 					<span>Usuarios</span>
 				</a>
 			</li>
-
-
 		}
-		
+
+		@if (await _usersService.CurrentUserIsAuthorizedAsync("ShowLogs", "Logs"))
+		{
+			<li class="nav-item">
+				<a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "AplicationLogs" ? "" : "collapsed") active" asp-controller="AplicationLogs" asp-action="Index">
+					<i class="bi bi-code-slash"></i>
+					<span>Logs</span>
+				</a>
+			</li>
+		}
+
 	</ul>
 
 </aside><!-- End Sidebar-->

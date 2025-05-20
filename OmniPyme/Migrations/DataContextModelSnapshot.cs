@@ -484,6 +484,9 @@ namespace OmniPyme.Web.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Photo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("PrivateURoleId")
                         .HasColumnType("int");
 

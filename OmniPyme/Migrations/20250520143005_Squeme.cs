@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace OmniPyme.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class Squema : Migration
+    public partial class Squeme : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -137,6 +137,7 @@ namespace OmniPyme.Web.Migrations
                     Document = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
+                    Photo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PrivateURoleId = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),

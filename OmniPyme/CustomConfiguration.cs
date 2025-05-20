@@ -40,16 +40,22 @@ namespace OmniPyme.Web
                 config.Position = NotyfPosition.BottomRight;
             });
 
-            //Log setup 
-           // AddLogConfiguration(builder);
+            //Log setup
+            AddLogConfiguration(builder);
 
             return builder;
         }
 
-        //private static void AddLogConfiguration(WebApplicationBuilder builder)
-        //{
-         //   throw new NotImplementedException();
-        //}
+        private static void AddLogConfiguration(WebApplicationBuilder builder)
+        {
+            Log.Logger = new LoggerConfiguration().WriteTo.File("logs/log.log",
+                                                                rollingInterval: RollingInterval.Day,
+                                                                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning)
+                                                  .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
+                                                  .CreateLogger();
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog();
+        }
 
         private static void AddServices(WebApplicationBuilder builder)
         {
@@ -64,6 +70,10 @@ namespace OmniPyme.Web
             builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddTransient<SeedDb>();
             builder.Services.AddTransient<IReadLogsService, ReadPlainTextLogsService>();
+
+            //Storage
+            builder.Services.AddKeyedScoped<IStorageService, LocalStorageService>("local");
+            builder.Services.AddKeyedScoped<IStorageService, AzureInvoiceStorageService>("azure");
 
             //Helpers
             builder.Services.AddScoped<ICombosHelper, CombosHelper>();
@@ -103,19 +113,19 @@ namespace OmniPyme.Web
             }).AddEntityFrameworkStores<DataContext>()
               .AddDefaultTokenProviders();
 
-            builder.Services.ConfigureApplicationCookie( conf=>
+            builder.Services.ConfigureApplicationCookie(conf =>
             {
                 conf.Cookie.Name = "Auth";
                 conf.ExpireTimeSpan = TimeSpan.FromDays(100);
                 conf.LoginPath = "/Account/Login";
                 conf.AccessDeniedPath = "/Errors/403";
-            
+
             });
-                
+
         }
 
-      
 
-       
+
+
     }
 }

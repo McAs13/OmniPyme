@@ -72,7 +72,7 @@ namespace OmniPyme.Web.Services
             if (!string.IsNullOrEmpty(request.Filter))
                 query = query.Where(x => x.ProductCategoryName.Contains(request.Filter));
 
-            query = query.OrderBy(x => x.ProductCategoryName);
+            query = query.OrderBy(x => x.Id);
 
             return await GetPaginationAsync<ProductCategory, ProductCategoryDTO>(request, query);
         }
