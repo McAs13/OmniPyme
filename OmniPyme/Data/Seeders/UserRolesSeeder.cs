@@ -55,6 +55,7 @@ namespace OmniPyme.Web.Data.Seeders
                     PhoneNumber = "300000000",
                     UserName = "Admin@yopmail.com",
                     Document = "11111122",
+                    Photo = "https://localhost:7045/users/0fb1b2a9-992a-4992-b70e-ee409baf034a.jpg",
                     PrivateURole = adminRole
                 };
 
@@ -79,6 +80,7 @@ namespace OmniPyme.Web.Data.Seeders
                     PhoneNumber = "3454657",
                     UserName = "gerente@yopmail.com",
                     Document = "176767565657",
+                    Photo = "https://localhost:7045/users/0fb1b2a9-992a-4992-b70e-ee409baf034a.jpg",
                     PrivateURole = gerenteRole
                 };
                 await _usersService.AddUserAsync(users, "1234");
@@ -100,6 +102,7 @@ namespace OmniPyme.Web.Data.Seeders
                     PhoneNumber = "345465347",
                     UserName = "vendedor@yopmail.com",
                     Document = "176723467565657",
+                    Photo = "https://localhost:7045/users/0fb1b2a9-992a-4992-b70e-ee409baf034a.jpg",
                     PrivateURole = vendedorRole
                 };
                 await _usersService.AddUserAsync(users, "1234");
@@ -121,6 +124,7 @@ namespace OmniPyme.Web.Data.Seeders
                     PhoneNumber = "345462345347",
                     UserName = "inventario@yopmail.com",
                     Document = "176723467345565657",
+                    Photo = "https://localhost:7045/users/0fb1b2a9-992a-4992-b70e-ee409baf034a.jpg",
                     PrivateURole = inventarioRole
                 };
                 await _usersService.AddUserAsync(users, "1234");
