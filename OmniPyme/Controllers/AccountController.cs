@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
+using OmniPyme.Web.Core;
 
 namespace OmniPyme.Web.Controllers
 {
@@ -14,12 +16,14 @@ namespace OmniPyme.Web.Controllers
         private readonly IUsersService _usersService;
         private readonly IMapper _mapper;
         private readonly INotyfService _notyfService;
+        private readonly IEmailService _emailService;
 
-        public AccountController(IUsersService usersService, IMapper mapper, INotyfService notyfService)
+        public AccountController(IUsersService usersService, IMapper mapper, INotyfService notyfService, IEmailService emailService)
         {
             _usersService = usersService;
             _mapper = mapper;
             _notyfService = notyfService;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -172,6 +176,85 @@ namespace OmniPyme.Web.Controllers
                 _notyfService.Error("Ha ocurrido un error. Por favor intente mas tarde");
                 return View();
             }
+        }
+
+        [HttpGet]
+        public IActionResult RecoveryPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RecoveryPassword(RecoveryPasswordDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                _notyfService.Error("Debe ajustar los errores de validación");
+                return View(dto);
+            }
+
+            Users? user = await _usersService.GetUserAsync(dto.Email);
+            if (user is null)
+            {
+                _notyfService.Error("Ha ocurrido un error. Intente mas tarde");
+                return View(dto);
+            }
+
+            string resetToken = await _usersService.GeneratePasswordResetTokenAsync(user);
+            string url = Url.Action("ResetPassword", "Account", new { token = resetToken, email = user.Email }, protocol: HttpContext.Request.Scheme)!;
+
+            Response<object> response = await _emailService.SendResetPasswordEmailAsync(user.Email!, "Para restablecer la contraseña haga click en el siguiente enlace", url);
+
+            if (!response.IsSuccess)
+            {
+                _notyfService.Error("Ha ocurrido un error. Intente mas tarde");
+                return View(dto);
+            }
+
+            _notyfService.Success($"Se ha enviado un correo para restablecer la contraseña al email ({user.Email})");
+            return RedirectToAction(nameof(Login));
+
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword([FromQuery] string token, [FromQuery] string email)
+        {
+            ResetPasswordDTO dto = new()
+            {
+                Token = token,
+                Email = email
+            };
+            return View(dto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                _notyfService.Error("Debe ajustar los errores de validación");
+                return View(dto);
+            }
+            Users? user = await _usersService.GetUserAsync(dto.Email);
+            if (user is null)
+            {
+                _notyfService.Error("Ha ocurrido un error. Intente mas tarde");
+                return View(dto);
+            }
+
+            IdentityResult result = await _usersService.ResetPasswordAsync(user, dto.Token, dto.Password);
+
+            if (!result.Succeeded)
+            {
+                string errors = string.Join(", ", result.Errors.Select(e => e.Description).ToList());
+                errors = errors.Replace("Invalid token.", "El email ingresado no coincide.");
+                ViewBag.Message = errors;
+                _notyfService.Error("Ha ocurrido un error");
+                return View(dto);
+            }
+
+            _notyfService.Success("Contraseña actualizada con éxito");
+            return RedirectToAction(nameof(Login));
         }
     }
 }
