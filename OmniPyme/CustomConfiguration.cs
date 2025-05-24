@@ -60,7 +60,9 @@ namespace OmniPyme.Web
         private static void AddServices(WebApplicationBuilder builder)
         {
             //Services
+            builder.Services.AddScoped<IApiService, ApiService>();
             builder.Services.AddScoped<IClientsService, ClientsService>();
+            builder.Services.AddScoped<IEmailService, MailtrapService>();
             builder.Services.AddScoped<IHomeService, HomeService>();
             builder.Services.AddScoped<IInvoicesService, InvoicesService>();
             builder.Services.AddScoped<IProductCategoriesService, ProductCategoriesService>();

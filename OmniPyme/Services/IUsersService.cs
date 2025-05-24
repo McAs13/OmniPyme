@@ -49,6 +49,7 @@ namespace OmniPyme.Web.Services
         private readonly IStorageService _localStorageService;
         private readonly IStorageService _azureStorageService;
         private readonly string _container = "users";
+        private const string DefaultUserImageUrl = "https://localhost:7045/users/0fb1b2a9-992a-4992-b70e-ee409baf034a.jpg";
 
         public UsersService(DataContext context,
                             UserManager<Users> userManager,
@@ -94,6 +95,7 @@ namespace OmniPyme.Web.Services
             {
                 Users users = _mapper.Map<Users>(dto);
                 users.Id = Guid.NewGuid().ToString();
+                users.Photo = DefaultUserImageUrl;
 
                 IdentityResult result = await AddUserAsync(users, dto.Document);
                 string token = await GenerateEmailConfirmationTokenAsync(users);
@@ -265,7 +267,24 @@ namespace OmniPyme.Web.Services
                         await dto.Photo.CopyToAsync(ms);
                         byte[] content = ms.ToArray();
                         string extension = Path.GetExtension(dto.Photo.FileName);
-                        users.Photo = await _localStorageService.SaveFileAsync(content, extension, _container, dto.Photo.ContentType);
+
+                        string oldPhoto = users.Photo;
+
+                        // Guardar la nueva imagen
+                        string newPhotoUrl = await _localStorageService.SaveFileAsync(
+                            content,
+                            extension,
+                            _container,
+                            dto.Photo.ContentType
+                        );
+
+                        // Solo eliminar la imagen anterior si no es la default
+                        if (!string.IsNullOrEmpty(oldPhoto) && !oldPhoto.Equals(DefaultUserImageUrl, StringComparison.OrdinalIgnoreCase))
+                        {
+                            await _localStorageService.DeleteFileAsync(oldPhoto, _container);
+                        }
+
+                        users.Photo = newPhotoUrl;
                     }
                 }
 
