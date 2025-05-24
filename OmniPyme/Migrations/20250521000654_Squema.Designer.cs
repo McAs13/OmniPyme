@@ -12,8 +12,8 @@ using OmniPyme.Data;
 namespace OmniPyme.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250520143005_Squeme")]
-    partial class Squeme
+    [Migration("20250521000654_Squema")]
+    partial class Squema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
