@@ -27,18 +27,6 @@ namespace OmniPyme.Web.Data.Seeders
 
         }
 
-        //private async Task BasicRoleAsync()
-        //{
-        //    bool exists = await _context.PrivateURoles.AnyAsync(r => r.Name == "Basic");
-
-        //    if (!exists)
-        //    {
-        //        PrivateURole role = new PrivateURole { Name = "Basic" };
-        //        await _context.PrivateURoles.AddAsync(role);
-        //        await _context.SaveChangesAsync();
-        //    }
-        //}
-
         private async Task CheckUsers()
         {
             Users? users = await _usersService.GetUserAsync("Admin@yopmail.com");

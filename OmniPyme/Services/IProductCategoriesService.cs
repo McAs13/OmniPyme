@@ -30,11 +30,27 @@ namespace OmniPyme.Web.Services
 
         public async Task<Response<ProductCategoryDTO>> CreateAsync(ProductCategoryDTO dto)
         {
+            // Validar que la categoria no exista
+            bool exists = await _context.ProductCategories
+                .AnyAsync(x => x.ProductCategoryName.ToLower() == dto.ProductCategoryName.Trim().ToLower());
+
+            if (exists)
+            {
+                return ResponseHelper<ProductCategoryDTO>.MakeResponseFail("Ya existe una categoría con ese nombre.");
+            }
+
             return await CreateAsync<ProductCategory, ProductCategoryDTO>(dto);
         }
 
         public async Task<Response<ProductCategoryDTO>> EditAsync(ProductCategoryDTO dto)
         {
+            // Validar que la categoria si exista
+            bool exists = await _context.ProductCategories
+                .AnyAsync(x => x.Id == dto.Id);
+            if (!exists)
+            {
+                return ResponseHelper<ProductCategoryDTO>.MakeResponseFail($"No existe la categoría con id {dto.Id}");
+            }
             return await EditAsync<ProductCategory, ProductCategoryDTO>(dto, dto.Id);
         }
 

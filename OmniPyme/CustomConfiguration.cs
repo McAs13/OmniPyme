@@ -1,7 +1,11 @@
-﻿using AspNetCoreHero.ToastNotification;
+﻿using System.Text;
+using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OmniPyme.Data;
 using OmniPyme.Web.Data.Entities;
 using OmniPyme.Web.Data.Seeders;
@@ -42,6 +46,12 @@ namespace OmniPyme.Web
 
             //Log setup
             AddLogConfiguration(builder);
+
+            //Desactivar autovalidacion del ModelState en API
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             return builder;
         }
@@ -122,13 +132,22 @@ namespace OmniPyme.Web
                 conf.ExpireTimeSpan = TimeSpan.FromDays(100);
                 conf.LoginPath = "/Account/Login";
                 conf.AccessDeniedPath = "/Errors/403";
-
             });
 
+            builder.Services.AddAuthentication()
+                            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                            {
+                                options.TokenValidationParameters = new TokenValidationParameters
+                                {
+                                    ValidateIssuer = true,
+                                    ValidateAudience = true,
+                                    ValidateLifetime = true,
+                                    ValidateIssuerSigningKey = true,
+                                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                                };
+                            });
         }
-
-
-
-
     }
 }

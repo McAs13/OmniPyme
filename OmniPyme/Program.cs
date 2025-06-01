@@ -23,7 +23,7 @@ WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
-{ 
+{
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
@@ -38,22 +38,24 @@ app.UseAuthorization();
 
 app.UseStatusCodePagesWithReExecute("/Errors/{0}");
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    endpoints.MapGet("/api/minimal", () =>
+    {
+        return "Hello from a minimal endpoint!";
+    });
+});
 
 app.AddCustomWebApplicationConfiguration();
 
-// Ejecutar Seeder
-/*
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var userManager = services.GetRequiredService<UserManager<Users>>();
-    var roleManager = services.GetRequiredService<RoleManager<Role>>();
-
-    await DataSeeder.SeedAsync(userManager, roleManager);
-}
-*/
-
 app.Run();
+
+public partial class Program { }

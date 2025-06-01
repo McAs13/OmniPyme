@@ -1,16 +1,19 @@
-﻿using AutoMapper;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OmniPyme.Data;
-using OmniPyme.Web.Core.Pagination;
 using OmniPyme.Web.Core;
+using OmniPyme.Web.Core.Pagination;
 using OmniPyme.Web.Data.Entities;
 using OmniPyme.Web.DTOs;
 using OmniPyme.Web.Helpers;
 using OmniPyme.Web.Services;
-
-using ClaimsUser = System.Security.Claims.ClaimsPrincipal;
 using Serilog;
+using ClaimsUser = System.Security.Claims.ClaimsPrincipal;
 
 namespace OmniPyme.Web.Services
 {
@@ -23,10 +26,10 @@ namespace OmniPyme.Web.Services
         public Task<string> GenerateEmailConfirmationTokenAsync(Users users);
         public Task<Users> GetUserAsync(string email);
         public Task<SignInResult> LoginAsync(LoginDTO dto);
+        public Task<Response<UserTokenDTO>> LoginApiAsync(LoginDTO dto);
         public Task LogoutAsync();
         public Task<Response<PaginationResponse<UsersDTO>>> GetPaginationAsync(PaginationRequest request);
         public Task<Response<UsersDTO>> CreateAsync(UsersDTO dto);
-
         public Task<Response<object>> DeleteAsync(string id);
         public Task<Users?> GetUserAsync(Guid id);
         public Task<Response<UsersDTO>> UpdateUserAsync(UsersDTO dto);
@@ -35,8 +38,6 @@ namespace OmniPyme.Web.Services
         public Task<string> GeneratePasswordResetTokenAsync(Users user);
         public Task<IdentityResult> ResetPasswordAsync(Users user, string resetToken, string newPassword);
         public Task<int> CountByRoleAsync(string role);
-
-
     }
 
     public class UsersService : CustomQueryableOperations, IUsersService
@@ -50,6 +51,7 @@ namespace OmniPyme.Web.Services
         private readonly IStorageService _azureStorageService;
         private readonly string _container = "users";
         private const string DefaultUserImageUrl = "https://localhost:7045/users/0fb1b2a9-992a-4992-b70e-ee409baf034a.jpg";
+        private readonly IConfiguration _configuration;
 
         public UsersService(DataContext context,
                             UserManager<Users> userManager,
@@ -57,7 +59,8 @@ namespace OmniPyme.Web.Services
                             IHttpContextAccessor httpContextAccessor,
                             IMapper mapper,
                             [FromKeyedServices("local")] IStorageService localStorageService,
-                            [FromKeyedServices("azure")] IStorageService azureStorageService)
+                            [FromKeyedServices("azure")] IStorageService azureStorageService,
+                            IConfiguration configuration)
             : base(context, mapper)
         {
             _context = context;
@@ -67,6 +70,7 @@ namespace OmniPyme.Web.Services
             _mapper = mapper;
             _localStorageService = localStorageService;
             _azureStorageService = azureStorageService;
+            _configuration = configuration;
         }
 
         public async Task<IdentityResult> AddUserAsync(Users users, string password)
@@ -296,6 +300,52 @@ namespace OmniPyme.Web.Services
                 Log.Error(ex.Message);
                 return 0;
             }
+        }
+
+        public async Task<Response<UserTokenDTO>> LoginApiAsync(LoginDTO dto)
+        {
+            try
+            {
+                SignInResult result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, false, false);
+
+                if (result.Succeeded)
+                {
+                    Users user = await _userManager.FindByEmailAsync(dto.Email);
+                    UserTokenDTO tokenDTO = await BuildTokenAsync(dto.Email, user.Id);
+
+                    return ResponseHelper<UserTokenDTO>.MakeResponseSuccess(tokenDTO, "Token obtenido con éxito");
+                }
+
+                return ResponseHelper<UserTokenDTO>.MakeResponseFail("Credenciales inválidas.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHelper<UserTokenDTO>.MakeResponseFail(ex);
+            }
+        }
+
+        private async Task<UserTokenDTO> BuildTokenAsync(string email, string id)
+        {
+            List<Claim> claims = [
+                new (ClaimTypes.Name, email),
+                new (ClaimTypes.Email, email),
+                new (ClaimTypes.NameIdentifier, id),
+                new ("userid", id),
+            ];
+            Users identityUser = await _userManager.FindByEmailAsync(email);
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            DateTime expiration = DateTime.UtcNow.AddYears(120);
+            JwtSecurityToken token = new JwtSecurityToken(issuer: _configuration["Jwt:Issuer"],
+                                                          audience: _configuration["Jwt:Audience"],
+                                                          claims: claims,
+                                                          expires: expiration,
+                                                          signingCredentials: creds);
+            return new UserTokenDTO
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expiration = expiration
+            };
         }
     }
 }

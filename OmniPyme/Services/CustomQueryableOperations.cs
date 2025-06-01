@@ -73,10 +73,17 @@ namespace OmniPyme.Web.Services
         {
             try
             {
-                TEntity entity = _mapper.Map<TEntity>(dto);
-                entity.Id = id;
+                if (id == 0)
+                {
+                    return ResponseHelper<TDTO>.MakeResponseFail("El ID es requerido.");
+                }
 
-                _context.Entry(entity).State = EntityState.Modified;
+                var trackedEntity = await _context.Set<TEntity>().FindAsync(id);
+                if (trackedEntity == null)
+                {
+                    return ResponseHelper<TDTO>.MakeResponseFail($"No se encontró la entidad con ID {id}.");
+                }
+                _mapper.Map(dto, trackedEntity);
                 await _context.SaveChangesAsync();
 
                 return ResponseHelper<TDTO>.MakeResponseSuccess(dto, "Registro actualizado con éxito");

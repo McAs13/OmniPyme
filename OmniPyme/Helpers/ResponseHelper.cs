@@ -36,6 +36,16 @@ namespace OmniPyme.Web.Helpers
             };
         }
 
+        public static Response<T> MakeResponseFail(string message, List<String> errors = null)
+        {
+            return new Response<T>
+            {
+                IsSuccess = false,
+                Message = message,
+                Errors = errors ?? []
+            };
+        }
+
         public static Response<T> MakeResponseFail(string message = "Ha ocurrido un error al generar la solicitud")
         {
             return new Response<T>
