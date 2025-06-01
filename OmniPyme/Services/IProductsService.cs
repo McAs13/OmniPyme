@@ -34,11 +34,25 @@ namespace OmniPyme.Web.Services
 
         public async Task<Response<ProductDTO>> CreateAsync(ProductDTO dto)
         {
+            // validar que el producto no exista
+            bool exists = await _context.Products
+                .AnyAsync(x => x.ProductName.ToLower() == dto.ProductName.Trim().ToLower());
+            if (exists)
+            {
+                return ResponseHelper<ProductDTO>.MakeResponseFail("Ya existe un producto con ese nombre.");
+            }
             return await CreateAsync<Product, ProductDTO>(dto);
         }
 
         public async Task<Response<ProductDTO>> EditAsync(ProductDTO dto)
         {
+            // validar que el producto si exista
+            bool exists = await _context.Products
+                .AnyAsync(x => x.Id == dto.Id);
+            if (!exists)
+            {
+                return ResponseHelper<ProductDTO>.MakeResponseFail($"No existe el producto con id {dto.Id}");
+            }
             return await EditAsync<Product, ProductDTO>(dto, dto.Id);
         }
 
